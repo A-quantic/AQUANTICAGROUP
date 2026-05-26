@@ -10,6 +10,26 @@
       "import": "./src/index.ts",
       "types": "./src/index.ts"
     },
+    "./button": {
+      "import": "./src/components/button.tsx",
+      "types": "./src/components/button.tsx"
+    },
+    "./card": {
+      "import": "./src/components/card.tsx",
+      "types": "./src/components/card.tsx"
+    },
+    "./input": {
+      "import": "./src/components/input.tsx",
+      "types": "./src/components/input.tsx"
+    },
+    "./label": {
+      "import": "./src/components/label.tsx",
+      "types": "./src/components/label.tsx"
+    },
+    "./lib/utils": {
+      "import": "./src/lib/utils.ts",
+      "types": "./src/lib/utils.ts"
+    },
     "./components/*": {
       "import": "./src/components/*.tsx",
       "types": "./src/components/*.tsx"
