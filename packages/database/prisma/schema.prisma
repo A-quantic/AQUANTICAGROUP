@@ -97,7 +97,8 @@ model Lead {
   clientProfileId String?
   clientProfile   ClientProfile? @relation(fields: [clientProfileId], references: [id])
   
-  convertedProject Project?
+  convertedProjectId String? @unique
+  convertedProject Project? @relation(fields: [convertedProjectId], references: [id])
   activities       ActivityLog[]
   
   createdAt   DateTime    @default(now())
@@ -141,6 +142,7 @@ model Project {
   documents   Document[]
   timelines   Timeline[]
   activities  ActivityLog[]
+  lead        Lead?
   
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
@@ -347,6 +349,7 @@ model ActivityLog {
   project     Project?     @relation(fields: [projectId], references: [id])
   
   leadId      String?
+  lead        Lead?        @relation(fields: [leadId], references: [id])
   
   createdAt   DateTime     @default(now())
 
