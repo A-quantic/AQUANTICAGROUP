@@ -1,0 +1,10 @@
+{
+  "name": "@aquantica/config",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./typescript/base.json",
+  "files": [
+    "typescript/*",
+    "tailwind/*"
+  ]
+}

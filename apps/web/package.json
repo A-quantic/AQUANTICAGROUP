@@ -1,0 +1,45 @@
+{
+  "name": "@aquantica/web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aquantica/database": "workspace:*",
+    "@aquantica/ui": "workspace:*",
+    "@clerk/nextjs": "^5.0.0",
+    "@hookform/resolvers": "^3.3.4",
+    "@tanstack/react-query": "^5.28.0",
+    "axios": "^1.6.8",
+    "framer-motion": "^11.0.0",
+    "next": "14.2.0",
+    "next-themes": "^0.3.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "react-hook-form": "^7.51.0",
+    "sonner": "^1.4.0",
+    "zod": "^3.22.4",
+    "date-fns": "^3.3.1",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "class-variance-authority": "^0.7.0"
+  },
+  "devDependencies": {
+    "@aquantica/config": "workspace:*",
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
+    "autoprefixer": "^10.4.18",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.3.3"
+  }
+}

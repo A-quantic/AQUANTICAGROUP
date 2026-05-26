@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AQUANTICA — Ingeniería, Arquitectura y Construcción</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#0a1628;--navy-mid:#11213f;--navy-light:#1a3057;
+  --gold:#c9a84c;--gold-light:#e2c47a;
+  --white:#ffffff;--text-muted:#8fa3bf;--wa:#25d366;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);overflow-x:hidden;}
+
+/* CURSOR (desktop only) */
+#cursor,#cursor-ring{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);border-radius:50%;}
+#cursor{width:10px;height:10px;background:var(--gold);transition:width .25s,height .25s;mix-blend-mode:difference;}
+#cursor-ring{width:34px;height:34px;border:1.5px solid rgba(201,168,76,.5);transition:width .3s,height .3s;z-index:9998;}
+@media(pointer:coarse){#cursor,#cursor-ring{display:none;}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 5%;background:rgba(10,22,40,.93);backdrop-filter:blur(16px);border-bottom:1px solid rgba(201,168,76,.15);transition:padding .3s;}
+nav.scrolled{padding:.7rem 5%;}
+.nav-logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;}
+.logo-svg{width:36px;height:36px;flex-shrink:0;}
+.nav-brand{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700;letter-spacing:.12em;color:var(--gold);}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{color:var(--text-muted);text-decoration:none;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;font-weight:500;transition:color .3s;position:relative;padding-bottom:2px;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s;}
+.nav-links a:hover{color:var(--gold);}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{background:transparent;border:1px solid var(--gold);color:var(--gold);padding:.48rem 1.2rem;font-size:.73rem;letter-spacing:.12em;text-transform:uppercase;font-family:'Barlow',sans-serif;font-weight:500;cursor:pointer;transition:all .3s;text-decoration:none;white-space:nowrap;}
+.nav-cta:hover{background:var(--gold);color:var(--navy);}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:24px;height:2px;background:var(--gold);transition:all .35s cubic-bezier(.23,1,.32,1);transform-origin:center;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* MOBILE MENU */
+.mobile-menu{position:fixed;inset:0;background:rgba(6,12,26,.97);backdrop-filter:blur(20px);z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;transform:translateX(100%);transition:transform .45s cubic-bezier(.23,1,.32,1);}
+.mobile-menu.open{transform:translateX(0);}
+.mobile-menu a{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:700;color:var(--white);text-decoration:none;transition:color .3s;}
+.mobile-menu a:hover{color:var(--gold);}
+.mobile-menu .m-sub{font-size:.85rem;letter-spacing:.2em;text-transform:uppercase;font-family:'Barlow',sans-serif;color:var(--text-muted);}
+
+/* HERO */
+.hero{min-height:100svh;display:flex;align-items:center;position:relative;overflow:hidden;padding:6rem 5% 4rem;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 65% 85% at 75% 50%,rgba(201,168,76,.07) 0%,transparent 70%),linear-gradient(155deg,#0a1628 0%,#11213f 55%,#0d1e37 100%);}
+.hero-grid{position:absolute;inset:0;opacity:.03;background-image:linear-gradient(rgba(201,168,76,.9) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.9) 1px,transparent 1px);background-size:55px 55px;}
+.particles-wrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.p{position:absolute;border-radius:50%;animation:floatUp linear infinite;}
+@keyframes floatUp{0%{transform:translateY(110vh);opacity:0;}10%{opacity:1;}90%{opacity:.4;}100%{transform:translateY(-60px);opacity:0;}}
+.hero-content{position:relative;z-index:2;max-width:680px;}
+.eyebrow{font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:1.4rem;display:flex;align-items:center;gap:.9rem;opacity:0;animation:fromLeft .8s .2s forwards;}
+.eyebrow::before{content:'';width:36px;height:1px;background:var(--gold);}
+@keyframes fromLeft{from{opacity:0;transform:translateX(-28px);}to{opacity:1;transform:none;}}
+.hero-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.7rem,7.5vw,5.4rem);font-weight:700;line-height:1.06;color:var(--white);opacity:0;animation:fromBelow .9s .4s forwards;}
+.hero-h1 span{color:var(--gold);display:block;}
+@keyframes fromBelow{from{opacity:0;transform:translateY(36px);}to{opacity:1;transform:none;}}
+.hero-badge{display:inline-block;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.28);color:var(--gold-light);font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;padding:.38rem .9rem;margin:1.4rem 0 1.8rem;opacity:0;animation:fadeIn .8s .65s forwards;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.hero-desc{font-size:.97rem;line-height:1.88;color:var(--text-muted);font-weight:300;max-width:510px;margin-bottom:2.2rem;opacity:0;animation:fromBelow .9s .58s forwards;}
+.hero-actions{display:flex;gap:.9rem;flex-wrap:wrap;opacity:0;animation:fromBelow .9s .75s forwards;}
+.btn-gold{background:var(--gold);color:var(--navy);padding:.88rem 2rem;font-family:'Barlow',sans-serif;font-size:.77rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.55rem;transition:transform .35s,box-shadow .35s;position:relative;overflow:hidden;}
+.btn-gold::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.16);transform:translateX(-101%);transition:transform .4s;}
+.btn-gold:hover::before{transform:translateX(0);}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(201,168,76,.32);}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.22);color:var(--white);padding:.88rem 2rem;font-family:'Barlow',sans-serif;font-size:.77rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.55rem;transition:all .35s;}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-3px);}
+.hero-stats{display:flex;gap:2rem;flex-wrap:wrap;margin-top:2.5rem;padding-top:2rem;border-top:1px solid rgba(201,168,76,.14);opacity:0;animation:fromBelow .9s .9s forwards;}
+.s-num{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:700;color:var(--gold);line-height:1;}
+.s-lbl{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-top:.2rem;}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;z-index:2;opacity:0;animation:fadeIn 1s 1.3s forwards;}
+.scroll-line{width:1px;height:52px;background:linear-gradient(to bottom,var(--gold),transparent);animation:pulse 2s ease-in-out infinite;}
+.scroll-lbl{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);}
+@keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+
+/* SECTIONS */
+section{padding:5rem 5%;}
+.s-label{font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:.9rem;display:flex;align-items:center;gap:.9rem;}
+.s-label::before{content:'';width:28px;height:1px;background:var(--gold);}
+.s-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.15;color:var(--white);margin-bottom:.9rem;}
+.s-title span{color:var(--gold);}
+.s-desc{font-size:.93rem;line-height:1.88;color:var(--text-muted);font-weight:300;}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(48px);transition:opacity .8s cubic-bezier(.23,1,.32,1),transform .8s cubic-bezier(.23,1,.32,1);}
+.rv-l{opacity:0;transform:translateX(-48px);transition:opacity .8s cubic-bezier(.23,1,.32,1),transform .8s cubic-bezier(.23,1,.32,1);}
+.rv-r{opacity:0;transform:translateX(48px);transition:opacity .8s cubic-bezier(.23,1,.32,1),transform .8s cubic-bezier(.23,1,.32,1);}
+.rv.on,.rv-l.on,.rv-r.on{opacity:1;transform:none;}
+
+/* SERVICES */
+#servicios{background:var(--navy-mid);}
+.svc-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3rem;flex-wrap:wrap;gap:1.5rem;}
+.svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5px;background:rgba(201,168,76,.1);border:1.5px solid rgba(201,168,76,.1);}
+.svc-card{background:var(--navy-mid);padding:2.4rem 1.8rem;position:relative;overflow:hidden;cursor:pointer;transition:background .4s;}
+.svc-card::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--gold);transition:width .5s cubic-bezier(.23,1,.32,1);}
+.svc-card:hover{background:var(--navy-light);}
+.svc-card:hover::after{width:100%;}
+.svc-num{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:rgba(201,168,76,.1);line-height:1;margin-bottom:.9rem;transition:color .4s;}
+.svc-card:hover .svc-num{color:rgba(201,168,76,.3);}
+.svc-icon{width:42px;height:42px;border:1px solid rgba(201,168,76,.28);display:flex;align-items:center;justify-content:center;margin-bottom:1.1rem;transition:background .4s,border-color .4s;}
+.svc-card:hover .svc-icon{background:rgba(201,168,76,.1);border-color:var(--gold);}
+.svc-icon svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:1.5;}
+.svc-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;color:var(--white);margin-bottom:.9rem;line-height:1.2;}
+.svc-list{list-style:none;}
+.svc-list li{font-size:.82rem;color:var(--text-muted);padding:.32rem 0 .32rem 1rem;border-bottom:1px solid rgba(255,255,255,.04);position:relative;}
+.svc-list li::before{content:'—';position:absolute;left:0;color:var(--gold);font-size:.68rem;}
+.ripple{position:absolute;border-radius:50%;background:rgba(201,168,76,.2);transform:scale(0);animation:rippleAnim .65s linear;pointer-events:none;}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0;}}
+
+/* WHY */
+#nosotros{background:var(--navy);}
+.why-wrap{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+.vals{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-top:2.2rem;}
+.val{border:1px solid rgba(201,168,76,.14);padding:1.4rem;transition:border-color .3s,background .3s,transform .3s;}
+.val:hover{border-color:var(--gold);background:rgba(201,168,76,.04);transform:translateY(-4px);}
+.val svg{width:30px;height:30px;stroke:var(--gold);fill:none;stroke-width:1.5;margin-bottom:.7rem;}
+.val-t{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.35rem;}
+.val-d{font-size:.81rem;color:var(--text-muted);line-height:1.6;}
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(201,168,76,.14);margin-top:4rem;}
+.pillar{padding:1.8rem 1.2rem;text-align:center;border-right:1px solid rgba(201,168,76,.11);transition:background .3s;}
+.pillar:last-child{border-right:none;}
+.pillar:hover{background:rgba(201,168,76,.04);}
+.pdot{width:7px;height:7px;background:var(--gold);margin:0 auto .7rem;transform:rotate(45deg);}
+.pt{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:700;color:var(--gold);margin-bottom:.35rem;}
+.pd{font-size:.76rem;color:var(--text-muted);line-height:1.5;}
+.quote-box{margin-top:2rem;padding:1.8rem;border:1px solid rgba(201,168,76,.18);background:rgba(201,168,76,.03);}
+.quote-text{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;color:var(--white);line-height:1.45;font-style:italic;}
+.quote-by{font-size:.72rem;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;margin-top:.75rem;}
+
+/* CONTACT */
+#contacto{background:var(--navy-mid);border-top:1px solid rgba(201,168,76,.14);}
+.ct-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;margin-top:3rem;align-items:start;}
+.ci{display:flex;align-items:flex-start;gap:.9rem;margin-bottom:1.8rem;}
+.ci-ic{width:38px;height:38px;flex-shrink:0;border:1px solid rgba(201,168,76,.22);display:flex;align-items:center;justify-content:center;transition:border-color .3s,background .3s;}
+.ci-ic:hover{border-color:var(--gold);background:rgba(201,168,76,.08);}
+.ci-ic svg{width:17px;height:17px;stroke:var(--gold);fill:none;stroke-width:1.5;}
+.ci-lbl{font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.25rem;}
+.ci-val{font-size:.9rem;color:var(--white);}
+.ci-val a{color:var(--gold);text-decoration:none;}
+.ci-val a:hover{color:var(--gold-light);}
+
+/* FORM */
+.form-wrap{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.18);padding:2.2rem;}
+.f-title{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:700;color:var(--white);margin-bottom:.35rem;}
+.f-title span{color:var(--gold);}
+.f-sub{font-size:.83rem;color:var(--text-muted);margin-bottom:1.8rem;}
+.fg{margin-bottom:1.1rem;position:relative;}
+.fg label{display:block;font-size:.67rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.45rem;transition:color .3s;}
+.fg:focus-within label{color:var(--gold);}
+.fg input,.fg textarea,.fg select{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.18);color:var(--white);padding:.8rem .95rem;font-family:'Barlow',sans-serif;font-size:.88rem;outline:none;transition:border-color .3s,background .3s;-webkit-appearance:none;appearance:none;}
+.fg select option{background:var(--navy-mid);}
+.fg input::placeholder,.fg textarea::placeholder{color:rgba(143,163,191,.38);}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--gold);background:rgba(201,168,76,.05);}
+.fg textarea{resize:vertical;min-height:90px;}
+.fg.err input,.fg.err textarea,.fg.err select{border-color:#e24b4a;}
+.err-msg{font-size:.72rem;color:#e24b4a;margin-top:.3rem;display:none;}
+.fg.err .err-msg{display:block;}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.f-btn{width:100%;background:var(--gold);color:var(--navy);border:none;padding:.95rem;font-family:'Barlow',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .35s;display:flex;align-items:center;justify-content:center;gap:.6rem;position:relative;overflow:hidden;}
+.f-btn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.18);transform:translateX(-101%);transition:transform .4s;}
+.f-btn:hover::before{transform:translateX(0);}
+.f-btn:hover{box-shadow:0 12px 32px rgba(201,168,76,.35);transform:translateY(-2px);}
+.f-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.f-btn svg{width:16px;height:16px;fill:var(--navy);}
+.f-success{display:none;text-align:center;padding:2rem 1rem;}
+.f-check{width:52px;height:52px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.1rem;}
+.f-check svg{width:22px;height:22px;stroke:#25d366;fill:none;stroke-width:2.2;}
+.f-success h4{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700;color:var(--white);margin-bottom:.4rem;}
+.f-success p{font-size:.85rem;color:var(--text-muted);}
+
+/* WA FLOAT */
+.wa-float{position:fixed;bottom:1.6rem;right:1.6rem;z-index:140;width:54px;height:54px;background:var(--wa);border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 6px 20px rgba(37,211,102,.38);animation:waGlow 3s ease-in-out infinite;transition:transform .3s,box-shadow .3s;}
+.wa-float:hover{transform:scale(1.1);box-shadow:0 10px 30px rgba(37,211,102,.55);}
+.wa-float svg{width:26px;height:26px;fill:white;}
+@keyframes waGlow{0%,100%{box-shadow:0 6px 20px rgba(37,211,102,.38),0 0 0 0 rgba(37,211,102,.28);}60%{box-shadow:0 6px 20px rgba(37,211,102,.38),0 0 0 12px rgba(37,211,102,0);}}
+
+/* FOOTER */
+footer{background:#060f1d;padding:2.2rem 5%;border-top:1px solid rgba(201,168,76,.14);}
+.ft-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem;}
+.ft-brand{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:var(--gold);letter-spacing:.12em;}
+.ft-tag{font-size:.7rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;margin-top:.15rem;}
+.ft-badges{display:flex;gap:1.4rem;flex-wrap:wrap;}
+.ft-badge{font-size:.68rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:.45rem;}
+.ft-badge::before{content:'';width:5px;height:5px;border:1px solid var(--gold);transform:rotate(45deg);flex-shrink:0;}
+.ft-copy{font-size:.7rem;color:rgba(143,163,191,.35);width:100%;text-align:center;padding-top:1.3rem;border-top:1px solid rgba(255,255,255,.04);margin-top:.8rem;}
+
+/* ====== RESPONSIVE ====== */
+@media(max-width:768px){
+  .nav-links,.nav-cta{display:none;}
+  .hamburger{display:flex;}
+
+  .hero{padding:5.5rem 5% 3rem;}
+  .scroll-hint{display:none;}
+  .hero-stats{gap:1.2rem 2rem;}
+
+  .svc-header{flex-direction:column;align-items:flex-start;}
+  .svc-grid{grid-template-columns:1fr;}
+
+  .why-wrap{grid-template-columns:1fr;gap:2.5rem;}
+  .vals{grid-template-columns:1fr 1fr;}
+  .pillars{grid-template-columns:repeat(2,1fr);}
+  .pillar{border-top:none;}
+  .pillar:nth-child(2n){border-right:none;}
+  .pillar:nth-child(3),.pillar:nth-child(4){border-top:1px solid rgba(201,168,76,.11);}
+
+  .ct-grid{grid-template-columns:1fr;gap:2.5rem;}
+  .f-row{grid-template-columns:1fr;}
+
+  .ft-row{flex-direction:column;align-items:flex-start;}
+
+  section{padding:3.5rem 5%;}
+}
+@media(max-width:400px){
+  .hero-h1{font-size:2.3rem;}
+  .hero-actions{flex-direction:column;}
+  .btn-gold,.btn-ghost{justify-content:center;}
+  .vals{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- WA FLOAT -->
+<a href="https://wa.me/51977498144?text=Hola%20AQUANTICA%2C%20quiero%20cotizar%20mi%20proyecto" class="wa-float" target="_blank" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+</a>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#servicios" onclick="closeMenu()">Servicios</a>
+  <a href="#nosotros" onclick="closeMenu()">Nosotros</a>
+  <a href="#contacto" onclick="closeMenu()">Contacto</a>
+  <a href="https://wa.me/51977498144" target="_blank" class="m-sub" onclick="closeMenu()">977 498 144</a>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <svg class="logo-svg" viewBox="0 0 44 44" fill="none">
+      <polygon points="22,4 38,36 6,36" fill="none" stroke="#c9a84c" stroke-width="2"/>
+      <polygon points="22,10 34,32 10,32" fill="rgba(201,168,76,.1)" stroke="#c9a84c" stroke-width="1"/>
+      <line x1="8" y1="40" x2="36" y2="40" stroke="#c9a84c" stroke-width="2"/>
+      <path d="M6 40 Q22 34 38 40" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
+    </svg>
+    <span class="nav-brand">AQUANTICA</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#nosotros">Nosotros</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <a href="#contacto" class="nav-cta">Cotizar</a>
+  <button class="hamburger" id="ham" aria-label="Menú" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="particles-wrap" id="pw"></div>
+  <div class="hero-content">
+    <p class="eyebrow">Ingeniería · Arquitectura · Construcción</p>
+    <h1 class="hero-h1">Diseñamos y construimos<span>El Futuro</span></h1>
+    <div class="hero-badge">Soluciones Integrales · Lima, Perú</div>
+    <p class="hero-desc">En AQUANTICA transformamos ideas en proyectos excepcionales, integrando ingeniería, arquitectura y construcción con los más altos estándares de calidad, innovación y sostenibilidad.</p>
+    <div class="hero-actions">
+      <a href="#contacto" class="btn-gold">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+        Cotiza tu proyecto
+      </a>
+      <a href="#servicios" class="btn-ghost">Ver servicios ↓</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="s-num" id="c1">4</div><div class="s-lbl">Servicios</div></div>
+      <div><div class="s-num" id="c2">100%</div><div class="s-lbl">Compromiso</div></div>
+      <div><div class="s-num" id="c3">10+</div><div class="s-lbl">Años exp.</div></div>
+      <div><div class="s-num" id="c4">200+</div><div class="s-lbl">Proyectos</div></div>
+    </div>
+  </div>
+  <div class="scroll-hint"><div class="scroll-line"></div><span class="scroll-lbl">Scroll</span></div>
+</section>
+
+<!-- SERVICES -->
+<section id="servicios">
+  <div class="svc-header">
+    <div class="rv-l">
+      <p class="s-label">Nuestros servicios</p>
+      <h2 class="s-title">Soluciones completas para <span>tu proyecto</span></h2>
+    </div>
+    <p class="s-desc rv-r" style="max-width:280px">Asesoría profesional sin compromiso.</p>
+  </div>
+  <div class="svc-grid">
+    <div class="svc-card rv" style="transition-delay:.05s">
+      <div class="svc-num">01</div>
+      <div class="svc-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 17h7M17.5 14v7"/></svg></div>
+      <h3 class="svc-name">Planificación y Obra</h3>
+      <ul class="svc-list"><li>Licencia de construcción</li><li>Ejecución de obras</li><li>Supervisión profesional</li></ul>
+    </div>
+    <div class="svc-card rv" style="transition-delay:.12s">
+      <div class="svc-num">02</div>
+      <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></div>
+      <h3 class="svc-name">Diseño Arquitectónico</h3>
+      <ul class="svc-list"><li>Planos vivienda unifamiliar y multifamiliar</li><li>Diseño de interiores y remodelaciones</li><li>Proyectos funcionales y modernos</li></ul>
+    </div>
+    <div class="svc-card rv" style="transition-delay:.19s">
+      <div class="svc-num">03</div>
+      <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></div>
+      <h3 class="svc-name">Saneamiento Físico Legal</h3>
+      <ul class="svc-list"><li>Independización de predios</li><li>Titulación de propiedad</li><li>Trámites: municipalidad, SUNARP, COFOPRI</li></ul>
+    </div>
+    <div class="svc-card rv" style="transition-delay:.26s">
+      <div class="svc-num">04</div>
+      <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+      <h3 class="svc-name">Compra y Venta</h3>
+      <ul class="svc-list"><li>Terrenos</li><li>Inmuebles residenciales y comerciales</li><li>Asesoría integral</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section id="nosotros">
+  <div class="why-wrap">
+    <div class="rv-l">
+      <p class="s-label">Nuestro enfoque</p>
+      <h2 class="s-title">Creamos futuro,<br><span>construimos sueños</span></h2>
+      <p class="s-desc">Transformamos tus ideas en soluciones reales, funcionales y sostenibles. Te guiamos en cada etapa con cercanía, transparencia y compromiso.</p>
+      <div class="vals">
+        <div class="val rv" style="transition-delay:.08s"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><div class="val-t">Ideas que Cobran Vida</div><p class="val-d">Transformamos tus ideas en soluciones reales y sostenibles.</p></div>
+        <div class="val rv" style="transition-delay:.14s"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><div class="val-t">Acompañamiento Personalizado</div><p class="val-d">Te guiamos en cada etapa con transparencia y compromiso.</p></div>
+        <div class="val rv" style="transition-delay:.2s"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg><div class="val-t">Crecemos Contigo</div><p class="val-d">Cada proyecto es una oportunidad para generar impacto positivo.</p></div>
+        <div class="val rv" style="transition-delay:.26s"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><div class="val-t">Calidad desde el Inicio</div><p class="val-d">Altos estándares en cada detalle, sin importar el tamaño.</p></div>
+      </div>
+    </div>
+    <div class="rv-r">
+      <div class="pillars">
+        <div class="pillar"><div class="pdot"></div><div class="pt">Calidad</div><p class="pd">Profesionales especializados en cada área.</p></div>
+        <div class="pillar"><div class="pdot"></div><div class="pt">Innovación</div><p class="pd">Tecnología y diseño de vanguardia.</p></div>
+        <div class="pillar"><div class="pdot"></div><div class="pt">Sostenibilidad</div><p class="pd">Responsabilidad ambiental y social.</p></div>
+        <div class="pillar"><div class="pdot"></div><div class="pt">Compromiso</div><p class="pd">Cumplimiento garantizado en plazos.</p></div>
+      </div>
+      <div class="quote-box rv" style="transition-delay:.3s">
+        <p class="quote-text">"Soluciones integrales,<br>resultados que trascienden."</p>
+        <p class="quote-by">— Equipo AQUANTICA</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contacto">
+  <div class="rv">
+    <p class="s-label">Contáctanos</p>
+    <h2 class="s-title">¡Cotiza tu proyecto <span>hoy!</span></h2>
+    <p class="s-desc">Asesoría profesional sin compromiso. Respondemos en menos de 24h.</p>
+  </div>
+  <div class="ct-grid">
+    <div class="rv-l" style="margin-top:1.5rem">
+      <div class="ci">
+        <div class="ci-ic"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg></div>
+        <div><div class="ci-lbl">WhatsApp / Teléfono</div><div class="ci-val"><a href="https://wa.me/51977498144" target="_blank">977 498 144</a></div></div>
+      </div>
+      <div class="ci">
+        <div class="ci-ic"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div><div class="ci-lbl">Oficina</div><div class="ci-val">Jr. Lima 354 – Edificio Murakami,<br>Piso 7, Oficina 704</div></div>
+      </div>
+      <div class="ci">
+        <div class="ci-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></div>
+        <div><div class="ci-lbl">Horario</div><div class="ci-val">Lun – Sáb: 9:00 am – 6:00 pm</div></div>
+      </div>
+      <a href="https://wa.me/51977498144?text=Hola%20AQUANTICA%2C%20quiero%20cotizar%20mi%20proyecto" target="_blank" class="btn-gold" style="width:100%;justify-content:center;margin-top:.5rem;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        Escribir por WhatsApp
+      </a>
+    </div>
+
+    <div class="rv-r">
+      <div class="form-wrap">
+        <div id="formBody">
+          <h3 class="f-title">Cuéntanos tu <span>proyecto</span></h3>
+          <p class="f-sub">Respondemos con una propuesta personalizada en menos de 24 horas.</p>
+          <div class="f-row">
+            <div class="fg" id="fg-name">
+              <label for="fname">Nombre *</label>
+              <input type="text" id="fname" placeholder="Tu nombre completo" autocomplete="given-name">
+              <span class="err-msg">Campo requerido</span>
+            </div>
+            <div class="fg" id="fg-phone">
+              <label for="fphone">Teléfono</label>
+              <input type="tel" id="fphone" placeholder="987 654 321" autocomplete="tel">
+            </div>
+          </div>
+          <div class="fg" id="fg-email">
+            <label for="femail">Correo electrónico *</label>
+            <input type="email" id="femail" placeholder="tu@correo.com" autocomplete="email">
+            <span class="err-msg">Ingresa un correo válido</span>
+          </div>
+          <div class="fg">
+            <label for="fservice">Servicio de interés</label>
+            <select id="fservice">
+              <option value="" disabled selected>Selecciona un servicio…</option>
+              <option>Planificación y Obra</option>
+              <option>Diseño Arquitectónico</option>
+              <option>Saneamiento Físico Legal</option>
+              <option>Compra y Venta</option>
+              <option>Consulta general</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label for="fmsg">Cuéntanos tu proyecto</label>
+            <textarea id="fmsg" placeholder="Describe brevemente qué necesitas…"></textarea>
+          </div>
+          <button class="f-btn" id="fBtn" onclick="submitForm()">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+            Enviar consulta
+          </button>
+        </div>
+        <div class="f-success" id="formSuccess">
+          <div class="f-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div>
+          <h4>¡Mensaje enviado!</h4>
+          <p>Gracias por contactarnos. Nuestro equipo se comunicará contigo a la brevedad.</p>
+          <a id="waSuccessLink" href="#" target="_blank" class="btn-gold" style="margin-top:1.5rem;display:inline-flex;justify-content:center;">También por WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-row">
+    <div><div class="ft-brand">AQUANTICA</div><div class="ft-tag">Creamos futuro, construimos sueños</div></div>
+    <div class="ft-badges">
+      <span class="ft-badge">Profesionales Especializados</span>
+      <span class="ft-badge">Calidad y Compromiso</span>
+      <span class="ft-badge">Seguridad Garantizada</span>
+    </div>
+  </div>
+  <div class="ft-copy">© 2025 Aquantica — Ingeniería, Arquitectura y Construcción · Jr. Lima 354, Edificio Murakami, Piso 7 Of. 704, Lima, Perú.</div>
+</footer>
+
+<script>
+// CURSOR
+const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+if(window.matchMedia('(pointer:fine)').matches){
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+  (function rAF(){rx+=(mx-rx)*.13;ry+=(my-ry)*.13;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(rAF);})();
+  document.querySelectorAll('a,button,.svc-card,.val').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cur.style.width='18px';cur.style.height='18px';ring.style.width='48px';ring.style.height='48px';});
+    el.addEventListener('mouseleave',()=>{cur.style.width='10px';cur.style.height='10px';ring.style.width='34px';ring.style.height='34px';});
+  });
+}
+
+// NAV SCROLL
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>60),{passive:true});
+
+// HAMBURGER
+function toggleMenu(){
+  const m=document.getElementById('mobileMenu'),h=document.getElementById('ham');
+  m.classList.toggle('open');h.classList.toggle('open');
+  document.body.style.overflow=m.classList.contains('open')?'hidden':'';
+}
+function closeMenu(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('ham').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// PARTICLES
+(function(){
+  const pw=document.getElementById('pw');
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');p.classList.add('p');
+    const sz=Math.random()*2.5+.8,gold=Math.random()>.45;
+    p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;background:${gold?'rgba(201,168,76,'+(Math.random()*.45+.18)+')':'rgba(255,255,255,'+(Math.random()*.12+.03)+')'};animation-duration:${Math.random()*14+9}s;animation-delay:${Math.random()*12}s;`;
+    pw.appendChild(p);
+  }
+})();
+
+// REVEAL
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');obs.unobserve(e.target);}});},{threshold:.1});
+document.querySelectorAll('.rv,.rv-l,.rv-r').forEach(el=>obs.observe(el));
+
+// COUNTERS
+let counted=false;
+const statObs=new IntersectionObserver(entries=>{
+  if(!counted&&entries[0].isIntersecting){
+    counted=true;
+    const counters=[{el:'c1',t:4,s:''},{el:'c2',t:100,s:'%'},{el:'c3',t:10,s:'+'},{el:'c4',t:200,s:'+'}];
+    counters.forEach(c=>{
+      const el=document.getElementById(c.el);
+      let n=0;const step=Math.ceil(c.t/35);
+      const iv=setInterval(()=>{n=Math.min(n+step,c.t);el.textContent=n+c.s;if(n>=c.t)clearInterval(iv);},28);
+    });
+  }
+},{threshold:.5});
+const statsEl=document.querySelector('.hero-stats');
+if(statsEl)statObs.observe(statsEl);
+
+// RIPPLE on touch
+document.querySelectorAll('.svc-card').forEach(card=>{
+  card.addEventListener('touchstart',e=>{
+    const r=document.createElement('span'),rect=card.getBoundingClientRect(),t=e.touches[0];
+    r.classList.add('ripple');
+    const sz=Math.max(rect.width,rect.height)*2;
+    r.style.cssText=`left:${t.clientX-rect.left}px;top:${t.clientY-rect.top}px;width:${sz}px;height:${sz}px;margin-left:-${sz/2}px;margin-top:-${sz/2}px;`;
+    card.appendChild(r);setTimeout(()=>r.remove(),700);
+  },{passive:true});
+});
+
+// ACTIVE NAV
+const secs=document.querySelectorAll('section[id]'),nls=document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll',()=>{
+  let cur='';secs.forEach(s=>{if(scrollY>=s.offsetTop-150)cur=s.id;});
+  nls.forEach(a=>{a.style.color=a.getAttribute('href')==='#'+cur?'var(--gold)':'';});
+},{passive:true});
+
+// FORM
+function submitForm(){
+  const name=document.getElementById('fname').value.trim();
+  const email=document.getElementById('femail').value.trim();
+  let ok=true;
+  // validate name
+  const fgN=document.getElementById('fg-name');
+  if(!name){fgN.classList.add('err');ok=false;}
+  else fgN.classList.remove('err');
+  // validate email
+  const fgE=document.getElementById('fg-email');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){fgE.classList.add('err');ok=false;}
+  else fgE.classList.remove('err');
+  if(!ok)return;
+  const btn=document.getElementById('fBtn');
+  btn.textContent='Enviando…';btn.disabled=true;
+  setTimeout(()=>{
+    const phone=document.getElementById('fphone').value;
+    const service=document.getElementById('fservice').value;
+    const msg=document.getElementById('fmsg').value.trim();
+    const wa=`Hola AQUANTICA, mi nombre es ${name}.${service?' Servicio de interés: '+service+'.':''} ${msg?'Proyecto: '+msg+'.':''} ${phone?'Tel: '+phone+'.':''} Correo: ${email}.`;
+    document.getElementById('waSuccessLink').href='https://wa.me/51977498144?text='+encodeURIComponent(wa);
+    document.getElementById('formBody').style.display='none';
+    document.getElementById('formSuccess').style.display='block';
+  },1100);
+}
+</script>
+</body>
+</html>

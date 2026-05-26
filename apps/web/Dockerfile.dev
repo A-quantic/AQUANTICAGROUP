@@ -1,0 +1,26 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies
+RUN apk add --no-cache libc6-compat
+
+# Copy package files
+COPY package.json package-lock.json* ./
+COPY ../../packages ./packages
+
+# Install dependencies
+RUN npm install
+
+# Copy source
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Environment
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+# Run dev server
+CMD ["npm", "run", "dev"]

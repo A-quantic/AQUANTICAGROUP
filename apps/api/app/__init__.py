@@ -1,0 +1,1 @@
+# AQUANTICA FastAPI Application

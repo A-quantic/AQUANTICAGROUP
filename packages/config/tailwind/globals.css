@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Barlow:wght@300;400;500;600&display=swap');
+
+@layer base {
+  :root {
+    --background: 222 47% 10%;
+    --foreground: 0 0% 100%;
+    --card: 222 47% 10%;
+    --card-foreground: 0 0% 100%;
+    --popover: 222 47% 10%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 43 55% 54%;
+    --primary-foreground: 222 47% 10%;
+    --secondary: 222 47% 15%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 222 47% 15%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 43 55% 54%;
+    --accent-foreground: 222 47% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 43 55% 54% / 0.15;
+    --input: 43 55% 54% / 0.15;
+    --ring: 43 55% 54%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .text-gradient-gold {
+    @apply bg-gradient-to-r from-gold to-gold-light bg-clip-text text-transparent;
+  }
+  .border-gold-subtle {
+    @apply border-gold/15;
+  }
+}
