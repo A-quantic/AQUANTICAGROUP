@@ -1,0 +1,551 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AQUANTICA GROUP - CORE SCHEMA
+// ============================================
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  clerkId       String    @unique // Clerk authentication ID
+  firstName     String?
+  lastName      String?
+  phone         String?
+  role          UserRole  @default(CLIENT)
+  status        UserStatus @default(ACTIVE)
+  
+  // Relations
+  clientProfile ClientProfile?
+  adminProfile  AdminProfile?
+  createdProjects Project[]      @relation("ProjectCreator")
+  assignedProjects Project[]     @relation("ProjectAssignee")
+  documents     Document[]
+  aiConversations AIConversation[]
+  activities    ActivityLog[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model ClientProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Client specific data
+  companyName String?
+  ruc         String?
+  address     String?
+  city          String?
+  department    String?
+  
+  // Relations
+  leads       Lead[]
+  projects    Project[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("client_profiles")
+}
+
+model AdminProfile {
+  id          String     @id @default(uuid())
+  userId      String     @unique
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Admin specific data
+  department  AdminDept
+  position    String?
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("admin_profiles")
+}
+
+model Lead {
+  id          String      @id @default(uuid())
+  
+  // Contact info
+  firstName   String
+  lastName    String?
+  email       String
+  phone       String?
+  
+  // Lead details
+  serviceType ServiceType
+  message     String?     @db.Text
+  source      LeadSource  @default(WEBSITE)
+  status      LeadStatus  @default(NEW)
+  priority    Priority    @default(MEDIUM)
+  
+  // AI classification
+  aiScore     Int?        // 0-100 lead quality score
+  aiNotes     String?     @db.Text
+  
+  // Relations
+  clientProfileId String?
+  clientProfile   ClientProfile? @relation(fields: [clientProfileId], references: [id])
+  
+  convertedProjectId String? @unique
+  convertedProject Project? @relation(fields: [convertedProjectId], references: [id])
+  activities       ActivityLog[]
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("leads")
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  
+  // Project info
+  code        String        @unique // AQ-2024-001
+  title       String
+  description String?       @db.Text
+  type        ProjectType
+  status      ProjectStatus @default(EVALUATION)
+  priority    Priority      @default(MEDIUM)
+  
+  // Timeline
+  startDate   DateTime?
+  endDate     DateTime?
+  deadline    DateTime?
+  
+  // Financial
+  budget      Decimal?      @db.Decimal(12, 2)
+  quotedAmount Decimal?     @db.Decimal(12, 2)
+  
+  // Relations
+  clientId    String
+  client      ClientProfile   @relation(fields: [clientId], references: [id])
+  
+  creatorId   String
+  creator     User            @relation("ProjectCreator", fields: [creatorId], references: [id])
+  
+  assigneeId  String?
+  assignee    User?           @relation("ProjectAssignee", fields: [assigneeId], references: [id])
+  
+  property    Property?
+  expediente  Expediente?
+  documents   Document[]
+  timelines   Timeline[]
+  activities  ActivityLog[]
+  lead        Lead?
+  
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@map("projects")
+}
+
+model Property {
+  id              String          @id @default(uuid())
+  
+  // Property details
+  title           String
+  description     String?         @db.Text
+  type            PropertyType
+  status          PropertyStatus  @default(ANALYSIS)
+  
+  // Location
+  address         String
+  district        String
+  province        String
+  department      String
+  latitude        Float?
+  longitude       Float?
+  
+  // Technical data
+  landArea        Float?          // m2
+  builtArea       Float?          // m2
+  yearBuilt       Int?
+  
+  // Legal data
+  partidaRegistral String?
+  sunarpNumber     String?
+  cofopriStatus    CofopriStatus?
+  
+  // Relations
+  projectId       String          @unique
+  project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("properties")
+}
+
+model Expediente {
+  id              String           @id @default(uuid())
+  
+  // Expediente info
+  code            String           @unique // EXP-2024-001
+  type            ExpedienteType
+  status          ExpedienteStatus @default(DRAFT)
+  
+  // Entities involved
+  municipality    String?
+  sunarpOffice    String?
+  cofopriOffice   String?
+  
+  // Timeline
+  submissionDate  DateTime?
+  resolutionDate  DateTime?
+  
+  // AI Analysis
+  aiSummary       String?          @db.Text
+  aiChecklist     Json?            // Generated by AI
+  missingDocs     String[]         // Documentos faltantes detectados por IA
+  
+  // Relations
+  projectId       String           @unique
+  project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  observations    Observation[]
+  documents       Document[]
+  timeline        Timeline[]
+  
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("expedientes")
+}
+
+model Observation {
+  id              String      @id @default(uuid())
+  
+  // Observation data
+  type            String      // Técnica, Legal, Administrativa
+  description     String      @db.Text
+  status          ObservationStatus @default(PENDING)
+  
+  // AI Analysis
+  aiAnalysis      String?     @db.Text
+  aiSuggestedResponse String? @db.Text
+  
+  // Entity
+  entity          String      // Municipalidad, SUNARP, COFOPRI
+  
+  // Relations
+  expedienteId    String
+  expediente      Expediente  @relation(fields: [expedienteId], references: [id], onDelete: Cascade)
+  
+  responseDate    DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@map("observations")
+}
+
+model Document {
+  id              String          @id @default(uuid())
+  
+  // Document info
+  name            String
+  type            DocumentType
+  category        DocumentCategory
+  
+  // File storage
+  fileUrl         String
+  fileKey         String          // S3/R2 key
+  fileSize        Int
+  mimeType        String
+  
+  // AI Processing
+  ocrText         String?         @db.Text
+  aiSummary       String?         @db.Text
+  aiExtractedData Json?           // Datos extraídos por IA
+  embeddingId     String?         // Vector DB reference
+  
+  // Relations
+  projectId       String?
+  project         Project?        @relation(fields: [projectId], references: [id])
+  
+  expedienteId    String?
+  expediente      Expediente?     @relation(fields: [expedienteId], references: [id])
+  
+  uploadedById    String
+  uploadedBy      User            @relation(fields: [uploadedById], references: [id])
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("documents")
+}
+
+model Timeline {
+  id          String   @id @default(uuid())
+  
+  // Event data
+  type        TimelineEventType
+  title       String
+  description String?  @db.Text
+  
+  // Status tracking
+  oldStatus   String?
+  newStatus   String?
+  
+  // Relations
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id])
+  
+  expedienteId String?
+  expediente   Expediente? @relation(fields: [expedienteId], references: [id])
+  
+  createdBy   String?
+  createdAt   DateTime @default(now())
+
+  @@map("timelines")
+}
+
+model AIConversation {
+  id          String   @id @default(uuid())
+  
+  // Chat data
+  sessionId   String   @unique
+  type        AIConvType
+  messages    Json[]   // Array of {role, content, timestamp}
+  
+  // Context
+  context     Json?    // Project, expediente, or lead context
+  
+  // Relations
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  
+  leadId      String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("ai_conversations")
+}
+
+model ActivityLog {
+  id          String       @id @default(uuid())
+  
+  // Activity data
+  type        ActivityType
+  description String
+  metadata    Json?
+  
+  // Relations
+  userId      String?
+  user        User?        @relation(fields: [userId], references: [id])
+  
+  projectId   String?
+  project     Project?     @relation(fields: [projectId], references: [id])
+  
+  leadId      String?
+  lead        Lead?        @relation(fields: [leadId], references: [id])
+  
+  createdAt   DateTime     @default(now())
+
+  @@map("activity_logs")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  ABOGADO
+  ARQUITECTO
+  INGENIERO
+  CLIENT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum AdminDept {
+  LEGAL
+  TECHNICAL
+  SALES
+  OPERATIONS
+  MANAGEMENT
+}
+
+enum ServiceType {
+  PLANIFICACION_OBRA
+  DISENO_ARQUITECTONICO
+  SANEAMIENTO_FISICO_LEGAL
+  COMPRA_VENTA
+  CONSULTA_GENERAL
+  LEVANTAMIENTO_TOPOGRAFICO
+  SUBDIVISION
+  INDEPENDIZACION
+}
+
+enum LeadSource {
+  WEBSITE
+  WHATSAPP
+  REFERRAL
+  SOCIAL_MEDIA
+  EMAIL
+  PHONE
+  WALK_IN
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  NEGOTIATION
+  CONVERTED
+  LOST
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ProjectType {
+  SANEAMIENTO
+  CONSTRUCCION
+  DISENO
+  CONSULTORIA
+  COMPRAVENTA
+  REGULARIZACION
+}
+
+enum ProjectStatus {
+  EVALUATION
+  QUOTED
+  APPROVED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum PropertyType {
+  RESIDENTIAL
+  COMMERCIAL
+  INDUSTRIAL
+  LAND
+  MIXED_USE
+}
+
+enum PropertyStatus {
+  ANALYSIS
+  TRAMITE
+  REGULARIZADO
+  SANEADO
+  VENDIDO
+}
+
+enum CofopriStatus {
+  FORMALIZADO
+  EN_FORMALIZACION
+  NO_FORMALIZADO
+  NO_APLICA
+}
+
+enum ExpedienteType {
+  MUNICIPAL_LICENCIA
+  MUNICIPAL_DECLARATORIA
+  SUNARP_INSCRIPCION
+  SUNARP_ACTUALIZACION
+  COFOPRI_FORMALIZACION
+  COFOPRI_INDEPENDIZACION
+  SUNAT_TRAMITE
+}
+
+enum ExpedienteStatus {
+  DRAFT
+  PENDING_DOCS
+  SUBMITTED
+  IN_REVIEW
+  OBSERVADO
+  RESOLVED
+  APPROVED
+  REJECTED
+  ARCHIVED
+}
+
+enum ObservationStatus {
+  PENDING
+  IN_PROGRESS
+  RESPONDED
+  RESOLVED
+  CLOSED
+}
+
+enum DocumentType {
+  PDF
+  IMAGE
+  CAD
+  EXCEL
+  WORD
+  OTHER
+}
+
+enum DocumentCategory {
+  PARTIDA_REGISTRAL
+  PLANO_CATASTRAL
+  LICENCIA
+  DECLARATORIA
+  CONTRATO
+  DNI
+  RECIBO_SERVICIOS
+  DECLARACION_JURADA
+  TUPA
+  OTROS
+}
+
+enum TimelineEventType {
+  STATUS_CHANGE
+  DOCUMENT_UPLOADED
+  OBSERVATION_ADDED
+  OBSERVATION_RESOLVED
+  AI_ANALYSIS
+  PAYMENT
+  MEETING
+  DEADLINE
+  NOTE
+}
+
+enum AIConvType {
+  PUBLIC_WEB // Chat en la landing
+  CLIENT_PORTAL // Chat en portal cliente
+  ADMIN_ASSISTANT // Asistente admin
+  DOCUMENT_ANALYSIS // Análisis documentos
+}
+
+enum ActivityType {
+  USER_LOGIN
+  USER_CREATED
+  LEAD_CREATED
+  LEAD_UPDATED
+  PROJECT_CREATED
+  PROJECT_UPDATED
+  DOCUMENT_UPLOADED
+  EXPEDIENTE_CREATED
+  EXPEDIENTE_UPDATED
+  OBSERVATION_ADDED
+  OBSERVATION_RESOLVED
+  AI_CONVERSATION
+  SETTINGS_CHANGED
+}
