@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { useDocuments, useUploadDocument } from "@/hooks/use-documents";
-import { Button } from "@aquantica/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@aquantica/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDropzone } from "react-dropzone";
 import {
   FileText,

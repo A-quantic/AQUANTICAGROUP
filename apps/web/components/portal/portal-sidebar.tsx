@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@aquantica/ui/lib/utils";
+import { cn } from "@/components/ui/utils";
 import {
   LayoutDashboard,
   FolderOpen,

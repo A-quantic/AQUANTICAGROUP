@@ -2,8 +2,8 @@
 
 import { useParams } from "next/navigation";
 import { useProject, useProjectDocuments, useProjectTimeline } from "@/hooks/use-projects";
-import { Button } from "@aquantica/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@aquantica/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {

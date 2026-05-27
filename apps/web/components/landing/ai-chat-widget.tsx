@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@aquantica/ui/button";
-import { Input } from "@aquantica/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Sparkles, X, Send, Bot, User } from "lucide-react";
 
 interface Message {

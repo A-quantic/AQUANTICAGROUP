@@ -2,11 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useAIChat } from "@/hooks/use-ai";
-import { Button } from "@aquantica/ui/button";
-import { Input } from "@aquantica/ui/input";
-import { Card, CardContent } from "@aquantica/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import { Send, Bot, User, Sparkles, Loader2 } from "lucide-react";
-import { cn } from "@aquantica/ui/lib/utils";
+import { cn } from "@/components/ui/utils";
 
 interface Message {
   id: string;

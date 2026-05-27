@@ -3,7 +3,7 @@
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Bell, Menu } from "lucide-react";
-import { Button } from "@aquantica/ui/button";
+import { Button } from "@/components/ui/button";
 
 export function PortalHeader() {
   return (

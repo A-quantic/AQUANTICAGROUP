@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent } from "@aquantica/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { FolderKanban, CheckCircle, Clock, AlertCircle } from "lucide-react";
 
 interface DashboardStatsProps {

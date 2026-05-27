@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@aquantica/ui/button";
+import { Button } from "@/components/ui/button";
 import { ArrowRight, Phone, ChevronDown } from "lucide-react";
 import Link from "next/link";
 

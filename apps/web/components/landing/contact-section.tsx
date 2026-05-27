@@ -4,10 +4,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
-import { Button } from "@aquantica/ui/button";
-import { Input } from "@aquantica/ui/input";
-import { Label } from "@aquantica/ui/label";
-import { Card, CardContent } from "@aquantica/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 import { Phone, MapPin, Clock, Send, CheckCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
