@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { prisma } from "@aquantica/database";
+import { prisma } from "@/lib/db";
 import { DashboardStats } from "@/components/portal/dashboard-stats";
 import { RecentProjects } from "@/components/portal/recent-projects";
 import { ExpedienteTimeline } from "@/components/portal/expediente-timeline";
