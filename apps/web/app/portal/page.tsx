@@ -33,10 +33,10 @@ export default async function PortalPage() {
   const user = await getDashboardData(userId);
   
   const projects = user?.clientProfile?.projects || [];
-  const activeProjects = projects.filter(p => 
+  const activeProjects = projects.filter((p: any) => 
     ["EVALUATION", "QUOTED", "APPROVED", "IN_PROGRESS"].includes(p.status)
   );
-  const completedProjects = projects.filter(p => p.status === "COMPLETED");
+  const completedProjects = projects.filter((p: any) => p.status === "COMPLETED");
 
   return (
     <div className="space-y-8">
