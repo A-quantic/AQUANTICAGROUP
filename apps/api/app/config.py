@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     
     # Database
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/aquantica"
+    DATABASE_URL: str = "postgresql://postgres:pAfNJwMZfRHwgBkkuVkAWYCaSjwKTZQv@postgres.railway.internal:5432/railway"
     
     # Clerk Auth
     CLERK_SECRET_KEY: str = ""
