@@ -1,11 +1,20 @@
-"""AI API endpoints - Usa modelo NLP local (RAG)"""
+"""AI API endpoints - Usa Ollama cuando está configurado"""
 
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
 from typing import List, Optional
 import uuid
 
-# Importar AI local
-from app.services.ai_local import chat_with_ai, classify_lead_ai, initialize_ai
+from app.config import settings
+
+# Intentar usar Ollama si está configurado, sino fallback a AI local
+if settings.AI_BASE_URL and settings.AI_MODEL_NAME:
+    from app.services.ai_ollama import chat_with_ollama as chat_with_ai
+    from app.services.ai_ollama import ollama_ai
+    AI_TYPE = "ollama"
+else:
+    from app.services.ai_local import chat_with_ai
+    from app.services.ai_local import ai_local
+    AI_TYPE = "local"
 
 # Fallbacks opcionales
 from app.services.ai_hybrid import (
@@ -41,14 +50,24 @@ async def chat_endpoint(request: dict):
 
 @router.get("/status")
 async def ai_status():
-    """Estado del AI local"""
-    from app.services.ai_local import ai_local
-    return {
-        "initialized": ai_local.initialized,
-        "model": "TinyLlama-1.1B + sentence-transformers + ChromaDB",
-        "type": "Local RAG",
-        "knowledge_base": "AQUANTICA Real Estate"
-    }
+    """Estado del AI"""
+    if AI_TYPE == "ollama":
+        from app.services.ai_ollama import ollama_ai
+        return {
+            "type": "ollama",
+            "available": ollama_ai.available,
+            "base_url": ollama_ai.base_url,
+            "model": ollama_ai.model_name,
+            "provider": "Ollama via ngrok"
+        }
+    else:
+        from app.services.ai_local import ai_local
+        return {
+            "type": "local",
+            "initialized": ai_local.initialized,
+            "model": "Rule-based + TinyLlama (if available)",
+            "provider": "Local AI"
+        }
 
 
 @router.post("/analyze-document")

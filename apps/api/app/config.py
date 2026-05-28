@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""  # Free tier: 15 req/min
     HUGGINGFACE_API_KEY: str = ""  # Free tier: ~1000 req/day
     
+    # Ollama (Local AI via ngrok)
+    AI_BASE_URL: str = ""  # e.g., https://washbasin-sibling-appraiser.ngrok-free.dev
+    AI_API_KEY: str = ""   # e.g., ollama_local
+    AI_MODEL_NAME: str = ""  # e.g., inmo-assistant
+    
     # Pinecone (optional for RAG)
     PINECONE_API_KEY: str = ""
     PINECONE_INDEX: str = "aquantica"
