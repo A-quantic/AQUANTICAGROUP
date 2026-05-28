@@ -47,8 +47,8 @@ app = FastAPI(
 @app.middleware("http")
 async def cors_middleware(request: Request, call_next):
     """Middleware CORS manual para manejar preflight y requests"""
+    # Manejar preflight OPTIONS
     if request.method == "OPTIONS":
-        # Responder directamente a preflight
         response = JSONResponse(content={})
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
@@ -56,10 +56,17 @@ async def cors_middleware(request: Request, call_next):
         response.headers["Access-Control-Max-Age"] = "3600"
         return response
     
-    # Procesar request normal
-    response = await call_next(request)
+    # Procesar request normal con manejo de excepciones
+    try:
+        response = await call_next(request)
+    except Exception as exc:
+        # Si hay excepción, crear respuesta de error con CORS
+        response = JSONResponse(
+            content={"error": "Internal Server Error"},
+            status_code=500
+        )
     
-    # Agregar headers CORS a todas las respuestas
+    # Agregar headers CORS a TODAS las respuestas (incluso errores)
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
     response.headers["Access-Control-Allow-Headers"] = "*"
