@@ -23,7 +23,8 @@ export async function POST(request: Request) {
 
     // Trigger AI classification (async)
     // This would call the FastAPI backend
-    fetch(`${process.env.API_URL}/api/leads/classify`, {
+    const apiUrl = (process.env.API_URL || "https://amused-peace-production-424b.up.railway.app").replace(/^http:\/\//, "https://");
+    fetch(`${apiUrl}/api/leads/classify`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ leadId: lead.id }),
