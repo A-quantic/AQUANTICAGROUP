@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, X, Send, Bot, User } from "lucide-react";
+import { Sparkles, X, Send, Bot, User, Loader2 } from "lucide-react";
+import { useAIChat } from "@/hooks/use-ai";
 
 interface Message {
   id: string;
@@ -34,8 +35,9 @@ export function AIChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [sessionId] = useState(() => crypto.randomUUID());
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const aiChat = useAIChat();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -46,10 +48,10 @@ export function AIChatWidget() {
   }, [messages]);
 
   const handleSend = async (content: string) => {
-    if (!content.trim()) return;
+    if (!content.trim() || aiChat.isPending) return;
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       role: "user",
       content,
       timestamp: new Date(),
@@ -57,36 +59,30 @@ export function AIChatWidget() {
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setIsTyping(true);
 
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
+    try {
+      const response = await aiChat.mutateAsync({
+        message: content,
+        sessionId,
+      });
+
       const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: crypto.randomUUID(),
         role: "assistant",
-        content: getAIResponse(content),
+        content: response.response,
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, aiMessage]);
-      setIsTyping(false);
-    }, 1500);
-  };
 
-  const getAIResponse = (question: string): string => {
-    const lower = question.toLowerCase();
-    if (lower.includes("independizar")) {
-      return "Para independizar un predio necesitas: 1) Copia literal de la partida registral, 2) Planos aprobados por municipalidad, 3) Certificado de parámetros urbanísticos, 4) Pago de tasas en SUNARP. El trámite toma aproximadamente 45-60 días. ¿Te gustaría que uno de nuestros especialistas revise tu caso específico?";
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      const errorMessage: Message = {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: "Lo siento, hubo un error. Intenta de nuevo o contáctanos por WhatsApp al 977 498 144.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     }
-    if (lower.includes("tarda") || lower.includes("tiempo")) {
-      return "El tiempo de un saneamiento varía según el caso: Saneamiento simple (3-6 meses), con observaciones municipales (6-12 meses), casos complejos con linderos (12-18 meses). Te damos garantía de respuesta en 24 horas y un cronograma detallado en tu expediente digital.";
-    }
-    if (lower.includes("documentos")) {
-      return "Los documentos base son: DNI del propietario, Partida registral actualizada, Recibo de agua o luz, Planos si los tienes. Cada caso es único - puedes subir tus documentos a nuestro portal y nuestra IA detectará automáticamente qué falta.";
-    }
-    if (lower.includes("sunarp") || lower.includes("inscribir")) {
-      return "Para inscribir en SUNARP necesitas presentar: Minuta o contrato, Partida registral del antecedente, Tasas pagadas. Lo hacemos por ti incluyendo la elaboración de la minuta. ¿Tienes ya los documentos listos?";
-    }
-    return "Gracias por tu consulta. Para darte información precisa sobre tu caso específico, te recomiendo agendar una evaluación gratuita con uno de nuestros especialistas. ¿Te gustaría que te contactemos por WhatsApp?";
   };
 
   return (
@@ -163,7 +159,7 @@ export function AIChatWidget() {
                   </div>
                 </div>
               ))}
-              {isTyping && (
+              {aiChat.isPending && (
                 <div className="flex gap-2">
                   <div className="w-8 h-8 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center">
                     <Sparkles className="w-4 h-4 text-gold" />
@@ -217,7 +213,7 @@ export function AIChatWidget() {
                   type="submit"
                   size="icon"
                   variant="gold"
-                  disabled={!input.trim() || isTyping}
+                  disabled={!input.trim() || aiChat.isPending}
                 >
                   <Send className="w-4 h-4" />
                 </Button>
