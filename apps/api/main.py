@@ -3,8 +3,9 @@ AQUANTICA API - FastAPI Backend
 Plataforma de Gestión Inmobiliaria y Saneamiento Documental
 """
 
-from fastapi import FastAPI, HTTPException, Depends, UploadFile, File
+from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import uvicorn
 
@@ -42,30 +43,39 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS - Configuración dinámica para permitir cualquier origen de Vercel
-# Si hay wildcard en CORS_ORIGINS, permitir cualquier origen dinámicamente
-if "*" in settings.CORS_ORIGINS:
-    # Modo desarrollo: permitir cualquier origen
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=False,  # False requerido cuando allow_origins=["*"]
-        allow_methods=["*"],
-        allow_headers=["*"],
-        expose_headers=["*"],
-        max_age=3600,
-    )
-else:
-    # Modo producción: orígenes específicos
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.CORS_ORIGINS,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-        expose_headers=["*"],
-        max_age=3600,
-    )
+# Middleware CORS manual - se ejecuta primero
+@app.middleware("http")
+async def cors_middleware(request: Request, call_next):
+    """Middleware CORS manual para manejar preflight y requests"""
+    if request.method == "OPTIONS":
+        # Responder directamente a preflight
+        response = JSONResponse(content={})
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Max-Age"] = "3600"
+        return response
+    
+    # Procesar request normal
+    response = await call_next(request)
+    
+    # Agregar headers CORS a todas las respuestas
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    
+    return response
+
+# CORS - Configuración adicional del middleware de FastAPI
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
+)
 
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
