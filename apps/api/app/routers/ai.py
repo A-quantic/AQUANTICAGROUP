@@ -5,44 +5,50 @@ from typing import List, Optional
 import uuid
 
 from app.config import settings
-
-# Intentar usar Ollama si está configurado, sino fallback a AI local
-if settings.AI_BASE_URL and settings.AI_MODEL_NAME:
-    from app.services.ai_ollama import chat_with_ollama as chat_with_ai
-    from app.services.ai_ollama import ollama_ai
-    AI_TYPE = "ollama"
-else:
-    from app.services.ai_local import chat_with_ai
-    from app.services.ai_local import ai_local
-    AI_TYPE = "local"
-
-# Fallbacks opcionales
+from app.services.ai_ollama import chat_with_ollama, OllamaAI
+from app.services.ai_local import chat_with_ai as chat_local
 from app.services.ai_hybrid import (
     analyze_document,
     generate_checklist,
     detect_missing_documents,
 )
 
+# Instancia de Ollama para verificar disponibilidad
+ollama_ai = OllamaAI()
+
+def get_ai_type():
+    """Determinar qué AI usar basado en configuración actual"""
+    if settings.AI_BASE_URL and settings.AI_MODEL_NAME:
+        return "ollama"
+    return "local"
+
+def get_chat_function():
+    """Obtener función de chat según configuración"""
+    if get_ai_type() == "ollama":
+        return chat_with_ollama
+    return chat_local
+
 router = APIRouter()
 
 
 @router.post("/chat")
 async def chat_endpoint(request: dict):
-    """Public AI chat endpoint usando modelo NLP local RAG"""
+    """Public AI chat endpoint usando modelo NLP"""
     message = request.get("message", "")
     session_id = request.get("session_id", str(uuid.uuid4()))
     
     try:
-        # Usar AI local con RAG
-        response = await chat_with_ai(
+        # Usar función de AI según configuración
+        chat_func = get_chat_function()
+        response = await chat_func(
             message=message,
             context_type="public",
         )
         return {
             "response": response,
             "session_id": session_id,
-            "model": "AQUANTICA-AI-Local-v1",
-            "type": "rag"
+            "model": "AQUANTICA-AI-Ollama" if get_ai_type() == "ollama" else "AQUANTICA-AI-Local",
+            "type": get_ai_type()
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -51,13 +57,13 @@ async def chat_endpoint(request: dict):
 @router.get("/status")
 async def ai_status():
     """Estado del AI"""
-    if AI_TYPE == "ollama":
-        from app.services.ai_ollama import ollama_ai
+    ai_type = get_ai_type()
+    if ai_type == "ollama":
         return {
             "type": "ollama",
             "available": ollama_ai.available,
-            "base_url": ollama_ai.base_url,
-            "model": ollama_ai.model_name,
+            "base_url": settings.AI_BASE_URL,
+            "model": settings.AI_MODEL_NAME,
             "provider": "Ollama via ngrok"
         }
     else:
@@ -68,6 +74,18 @@ async def ai_status():
             "model": "Rule-based + TinyLlama (if available)",
             "provider": "Local AI"
         }
+
+
+@router.get("/debug")
+async def ai_debug():
+    """Debug - Ver configuración de AI (solo para desarrollo)"""
+    return {
+        "ai_base_url": settings.AI_BASE_URL,
+        "ai_model_name": settings.AI_MODEL_NAME,
+        "ai_api_key_set": bool(settings.AI_API_KEY),
+        "ai_type": get_ai_type(),
+        "ollama_available": ollama_ai.available,
+    }
 
 
 @router.post("/analyze-document")
