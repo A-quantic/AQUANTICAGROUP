@@ -2,11 +2,21 @@
 
 import axios, { AxiosError, AxiosInstance } from "axios";
 
-// CACHE_BUST: 2024-01-v2 - Forzar HTTPS siempre, nunca HTTP
-const RAW_URL = process.env.NEXT_PUBLIC_API_URL || "https://amused-peace-production-424b.up.railway.app";
-console.log("[API-CLIENT] Raw URL:", RAW_URL);
-const API_URL = RAW_URL.replace(/^http:\/\//i, "https://");
-console.log("[API-CLIENT] Final URL:", API_URL);
+// BUILD_ID: 2024-01-v3 - HTTPS ENFORCED
+function getApiUrl(): string {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+  const defaultUrl = "https://amused-peace-production-424b.up.railway.app";
+  const url = envUrl || defaultUrl;
+  
+  // Forzar HTTPS - reemplazar cualquier http:// por https://
+  if (url.startsWith("http://")) {
+    return url.replace("http://", "https://");
+  }
+  return url;
+}
+
+const API_URL = getApiUrl();
+console.log("[API] URL configured:", API_URL);
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_URL,
@@ -16,9 +26,17 @@ export const apiClient: AxiosInstance = axios.create({
   timeout: 30000,
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and debug
 apiClient.interceptors.request.use(
   async (config) => {
+    // Debug: log actual URL being used
+    console.log("[API] Request to:", config.baseURL, config.url);
+    
+    // Ensure HTTPS in baseURL
+    if (config.baseURL && config.baseURL.startsWith("http://")) {
+      config.baseURL = config.baseURL.replace("http://", "https://");
+    }
+    
     // Get Clerk token if available
     const token = localStorage.getItem("clerk-token");
     if (token) {
