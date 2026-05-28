@@ -41,6 +41,15 @@ async def get_db():
 
 
 async def init_db():
-    """Initialize database tables"""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """Initialize database tables (optional - doesn't fail if DB unavailable)"""
+    if not settings.DATABASE_URL:
+        print("⚠️  DATABASE_URL not set - skipping database initialization")
+        return
+    
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print("✅ Database initialized successfully")
+    except Exception as e:
+        print(f"⚠️  Database initialization failed: {e}")
+        print("⚠️  Application will continue without database functionality")
