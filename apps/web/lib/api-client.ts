@@ -92,11 +92,11 @@ export const leadsApi = {
 
 export const projectsApi = {
   list: async () => {
-    const response = await apiClient.get("/api/projects");
+    const response = await apiClient.get("/api/projects/");
     return response.data;
   },
   get: async (id: string) => {
-    const response = await apiClient.get(`/api/projects/${id}`);
+    const response = await apiClient.get(`/api/projects/${id}/`);
     return response.data;
   },
   create: async (data: {
@@ -104,19 +104,19 @@ export const projectsApi = {
     description?: string;
     type: string;
   }) => {
-    const response = await apiClient.post("/api/projects", data);
+    const response = await apiClient.post("/api/projects/", data);
     return response.data;
   },
   update: async (id: string, data: Partial<Project>) => {
-    const response = await apiClient.put(`/api/projects/${id}`, data);
+    const response = await apiClient.put(`/api/projects/${id}/`, data);
     return response.data;
   },
   getDocuments: async (id: string) => {
-    const response = await apiClient.get(`/api/projects/${id}/documents`);
+    const response = await apiClient.get(`/api/projects/${id}/documents/`);
     return response.data;
   },
   getTimeline: async (id: string) => {
-    const response = await apiClient.get(`/api/projects/${id}/timeline`);
+    const response = await apiClient.get(`/api/projects/${id}/timeline/`);
     return response.data;
   },
 };
