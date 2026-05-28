@@ -96,8 +96,13 @@ export function HeroSection() {
             variants={itemVariants}
             className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.06] mb-6"
           >
-            Saneamos tu propiedad{" "}
-            <span className="text-gold block">en 90 días</span>
+            AQUANTICA GROUP:
+            <span className="text-gold block text-4xl sm:text-5xl lg:text-6xl mt-2">
+              Saneamiento Inmobiliario en Perú
+            </span>
+            <span className="text-2xl sm:text-3xl lg:text-4xl text-white/80 block mt-2">
+              SUNARP · COFOPRI · Licencias
+            </span>
           </motion.h1>
 
           <motion.div

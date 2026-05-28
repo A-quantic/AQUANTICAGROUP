@@ -1,8 +1,18 @@
+import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 import { DashboardStats } from "@/components/portal/dashboard-stats";
 import { RecentProjects } from "@/components/portal/recent-projects";
 import { ExpedienteTimeline } from "@/components/portal/expediente-timeline";
+
+export const metadata: Metadata = {
+  title: "Portal de Clientes | Gestión de Proyectos Inmobiliarios",
+  description: "Accede a tu portal de cliente AQUANTICA GROUP. Gestiona tus proyectos de saneamiento inmobiliario, revisa documentos y sigue el estado de tus trámites SUNARP y COFOPRI.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 async function getDashboardData(userId: string) {
   try {
