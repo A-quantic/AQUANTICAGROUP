@@ -1,12 +1,15 @@
-"""AI API endpoints"""
+"""AI API endpoints - Usa modelo NLP local (RAG)"""
 
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
 from typing import List, Optional
 import uuid
 
+# Importar AI local
+from app.services.ai_local import chat_with_ai, classify_lead_ai, initialize_ai
+
+# Fallbacks opcionales
 from app.services.ai_hybrid import (
     analyze_document,
-    chat_with_context,
     generate_checklist,
     detect_missing_documents,
 )
@@ -16,22 +19,36 @@ router = APIRouter()
 
 @router.post("/chat")
 async def chat_endpoint(request: dict):
-    """Public AI chat endpoint for website visitors"""
+    """Public AI chat endpoint usando modelo NLP local RAG"""
     message = request.get("message", "")
     session_id = request.get("session_id", str(uuid.uuid4()))
     
     try:
-        response = await chat_with_context(
+        # Usar AI local con RAG
+        response = await chat_with_ai(
             message=message,
-            session_id=session_id,
             context_type="public",
         )
         return {
             "response": response,
             "session_id": session_id,
+            "model": "AQUANTICA-AI-Local-v1",
+            "type": "rag"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/status")
+async def ai_status():
+    """Estado del AI local"""
+    from app.services.ai_local import ai_local
+    return {
+        "initialized": ai_local.initialized,
+        "model": "TinyLlama-1.1B + sentence-transformers + ChromaDB",
+        "type": "Local RAG",
+        "knowledge_base": "AQUANTICA Real Estate"
+    }
 
 
 @router.post("/analyze-document")

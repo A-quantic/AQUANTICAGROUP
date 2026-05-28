@@ -19,6 +19,17 @@ async def lifespan(app: FastAPI):
     # Startup
     print("🚀 Starting AQUANTICA API...")
     await init_db()
+    
+    # Inicializar AI local (no bloquear si falla)
+    try:
+        from app.services.ai_local import initialize_ai
+        import asyncio
+        # Inicializar en background para no bloquear startup
+        asyncio.create_task(initialize_ai())
+        print("🧠 AI Local initialization started (background)")
+    except Exception as e:
+        print(f"⚠️  AI Local initialization failed: {e}")
+    
     yield
     # Shutdown
     print("👋 Shutting down AQUANTICA API...")

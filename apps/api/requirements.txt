@@ -10,14 +10,18 @@ alembic==1.13.1
 psycopg2-binary==2.9.9
 pgvector==0.2.5
 
-# AI & LLM
+# AI & LLM - LOCAL
 langchain==0.1.16
-langchain-openai==0.1.3
 langchain-community==0.0.34
-langchain-pinecone==0.1.3
-openai==1.23.2
-pinecone-client>=5.0.0,<6.0.0
-tiktoken==0.6.0
+sentence-transformers==2.5.1
+chromadb==0.4.24
+transformers==4.38.2
+torch==2.2.1
+accelerate==0.27.2
+# Opcional: OpenAI para fallback (no requerido)
+# openai==1.23.2
+# pinecone-client>=5.0.0,<6.0.0
+# tiktoken==0.6.0
 
 # OCR & Document Processing
 pypdf==4.2.0
