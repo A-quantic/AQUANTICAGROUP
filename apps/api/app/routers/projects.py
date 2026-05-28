@@ -1,6 +1,7 @@
 """Projects API endpoints"""
 
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from typing import List, Optional
@@ -53,12 +54,14 @@ async def list_projects(
             "creatorId": str(p.creatorId) if p.creatorId else None,
         })
     
-    return {
+    response = JSONResponse({
         "projects": projects_list,
         "total": total,
         "skip": skip,
         "limit": limit,
-    }
+    })
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 @router.post("/")
@@ -86,7 +89,7 @@ async def create_project(
     await db.commit()
     await db.refresh(new_project)
     
-    return {
+    response = JSONResponse({
         "id": str(new_project.id),
         "code": new_project.code,
         "title": new_project.title,
@@ -94,7 +97,9 @@ async def create_project(
         "type": new_project.type.value if hasattr(new_project.type, 'value') else new_project.type,
         "status": new_project.status.value if hasattr(new_project.status, 'value') else new_project.status,
         "createdAt": new_project.createdAt.isoformat() if new_project.createdAt else None,
-    }
+    })
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 @router.get("/{project_id}/")
