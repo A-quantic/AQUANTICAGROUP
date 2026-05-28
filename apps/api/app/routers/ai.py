@@ -79,13 +79,94 @@ async def ai_status():
 @router.get("/debug")
 async def ai_debug():
     """Debug - Ver configuración de AI (solo para desarrollo)"""
+    
+    # Test de conexión con Ollama
+    ollama_test = None
+    error_msg = None
+    
+    if settings.AI_BASE_URL and settings.AI_MODEL_NAME:
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                # Test básico de conectividad
+                response = await client.get(f"{settings.AI_BASE_URL}/v1/models")
+                ollama_test = {
+                    "models_endpoint_status": response.status_code,
+                    "models": response.json() if response.status_code == 200 else None
+                }
+                
+                # Test de chat simple
+                chat_response = await client.post(
+                    f"{settings.AI_BASE_URL}/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {settings.AI_API_KEY}"},
+                    json={
+                        "model": settings.AI_MODEL_NAME,
+                        "messages": [{"role": "user", "content": "hola"}],
+                        "max_tokens": 50
+                    }
+                )
+                ollama_test["chat_endpoint_status"] = chat_response.status_code
+                ollama_test["chat_response_preview"] = chat_response.text[:200] if chat_response.status_code == 200 else chat_response.text
+                
+        except Exception as e:
+            error_msg = str(e)
+            ollama_test = {"error": error_msg}
+    
     return {
         "ai_base_url": settings.AI_BASE_URL,
         "ai_model_name": settings.AI_MODEL_NAME,
         "ai_api_key_set": bool(settings.AI_API_KEY),
         "ai_type": get_ai_type(),
         "ollama_available": ollama_ai.available,
+        "connection_test": ollama_test,
     }
+
+
+@router.get("/test-chat")
+async def ai_test_chat():
+    """Test directo de chat con Ollama"""
+    if not settings.AI_BASE_URL or not settings.AI_MODEL_NAME:
+        return {"error": "Ollama no configurado", "type": "local"}
+    
+    try:
+        import httpx
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                f"{settings.AI_BASE_URL}/v1/chat/completions",
+                headers={"Authorization": f"Bearer {settings.AI_API_KEY}"},
+                json={
+                    "model": settings.AI_MODEL_NAME,
+                    "messages": [
+                        {"role": "system", "content": "Eres AURA de AQUANTICA. Responde brevemente."},
+                        {"role": "user", "content": "hola, ¿qué servicios ofreces?"}
+                    ],
+                    "temperature": 0.7,
+                    "max_tokens": 200,
+                    "stream": False
+                }
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                return {
+                    "status": "success",
+                    "type": "ollama",
+                    "response": data["choices"][0]["message"]["content"],
+                    "model": settings.AI_MODEL_NAME
+                }
+            else:
+                return {
+                    "status": "error",
+                    "http_status": response.status_code,
+                    "response_text": response.text
+                }
+                
+    except Exception as e:
+        return {
+            "status": "exception",
+            "error": str(e),
+            "type": "error"
+        }
 
 
 @router.post("/analyze-document")
