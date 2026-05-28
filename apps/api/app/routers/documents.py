@@ -13,7 +13,7 @@ from app.services.ai import analyze_document
 router = APIRouter()
 
 
-@router.options("/upload")
+@router.options("/upload/")
 async def upload_options():
     """Handle CORS preflight for upload"""
     response = JSONResponse(content={})
@@ -23,7 +23,7 @@ async def upload_options():
     return response
 
 
-@router.post("/upload")
+@router.post("/upload/")
 async def upload_document(
     file: UploadFile = File(...),
     project_id: Optional[str] = Form(None),
@@ -75,7 +75,7 @@ async def list_documents(
     }
 
 
-@router.get("/{document_id}")
+@router.get("/{document_id}/")
 async def get_document(
     document_id: str,
     db: AsyncSession = Depends(get_db),
@@ -88,7 +88,7 @@ async def get_document(
     }
 
 
-@router.delete("/{document_id}")
+@router.delete("/{document_id}/")
 async def delete_document(
     document_id: str,
     db: AsyncSession = Depends(get_db),

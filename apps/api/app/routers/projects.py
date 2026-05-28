@@ -44,7 +44,7 @@ async def create_project(
     }
 
 
-@router.get("/{project_id}")
+@router.get("/{project_id}/")
 async def get_project(
     project_id: str,
     db: AsyncSession = Depends(get_db),
@@ -59,7 +59,7 @@ async def get_project(
     }
 
 
-@router.put("/{project_id}")
+@router.put("/{project_id}/")
 async def update_project(
     project_id: str,
     update_data: dict,
@@ -73,7 +73,7 @@ async def update_project(
     }
 
 
-@router.get("/{project_id}/documents")
+@router.get("/{project_id}/documents/")
 async def get_project_documents(
     project_id: str,
     db: AsyncSession = Depends(get_db),
@@ -85,7 +85,7 @@ async def get_project_documents(
     }
 
 
-@router.get("/{project_id}/timeline")
+@router.get("/{project_id}/timeline/")
 async def get_project_timeline(
     project_id: str,
     db: AsyncSession = Depends(get_db),
