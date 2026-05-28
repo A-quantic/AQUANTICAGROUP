@@ -197,10 +197,55 @@ SECTORES ATENDIDOS:
         
         return chunks
     
+    def _rule_based_response(self, message: str) -> str:
+        """
+        Sistema de respuestas basado en reglas (fallback cuando LLM no está disponible)
+        Analiza palabras clave y devuelve respuestas relevantes de AQUANTICA
+        """
+        msg_lower = message.lower()
+        
+        # Detectar intención por palabras clave
+        if any(word in msg_lower for word in ["hola", "buenos días", "buenas tardes", "saludos"]):
+            return "¡Hola! Soy AURA, el asistente virtual de AQUANTICA. ¿En qué puedo ayudarte hoy con tus proyectos de ingeniería, arquitectura o construcción?"
+        
+        if any(word in msg_lower for word in ["precio", "costo", "cuánto cuesta", "tarifa", "cotizar", "cotización"]):
+            return "Los precios varían según el proyecto. Ofrecemos evaluación gratuita para darte una cotización precisa. ¿Qué tipo de proyecto necesitas? Podemos cotizar: diseño arquitectónico, ingeniería civil, construcción, o saneamiento legal."
+        
+        if any(word in msg_lower for word in ["ingeniería", "estructura", "cálculo", "cimentación", "sismo", "losas", "columnas"]):
+            return "En AQUANTICA contamos con ingenieros civiles especializados en diseño estructural, cálculo y simulación estructural, ingeniería sísmica y proyectos de edificación. ¿Necesitas una evaluación estructural para tu proyecto?"
+        
+        if any(word in msg_lower for word in ["arquitectura", "diseño", "plano", "render", "fachada", "interior", "fachada"]):
+            return "Ofrecemos servicios de arquitectura: diseño arquitectónico residencial y comercial, diseño de interiores, renders y visualización 3D, y gestión de proyectos arquitectónicos. ¿Tienes un proyecto en mente? Podemos ayudarte desde el concepto hasta la construcción."
+        
+        if any(word in msg_lower for word in ["construcción", "construir", "obra", "edificar", "remodelar", "ampliar", "reforma"]):
+            return "Realizamos construcción de edificaciones, remodelaciones, ampliaciones, gestión de obra y control de calidad. Trabajamos en proyectos residenciales, comerciales e industriales. ¿Quieres iniciar una obra o remodelar un espacio existente?"
+        
+        if any(word in msg_lower for word in ["saneamiento", "regularizar", "licencia", "habilitación", "declaratoria", "independizar", "subdividir", "municipal", "municipalidad"]):
+            return "En AQUANTICA nos especializamos en saneamiento físico legal: regularización de inmuebles, declaratoria de fábrica, independización de lotes, subdivisiones, lotizaciones, licencias de edificación y habilitaciones urbanas. ¿Necesitas regularizar tu propiedad? Te ayudamos con todo el proceso municipal."
+        
+        if any(word in msg_lower for word in ["tiempo", "duración", "cuánto demora", "plazo", "cuándo", "fecha"]):
+            return "Los plazos dependen del tipo y complejidad del proyecto. Una evaluación inicial toma 1-2 días, diseño arquitectónico 2-4 semanas, y proyectos de construcción varían según el tamaño. ¿Tienes un proyecto específico? Podemos darte un cronograma estimado en la evaluación gratuita."
+        
+        if any(word in msg_lower for word in ["contacto", "teléfono", "whatsapp", "email", "correo", "llamar", "ubicación", "dónde están", "dirección"]):
+            return "Puedes contactarnos por WhatsApp al 977 498 144 o visitar nuestra web aquantica-group.com. Estamos en Lima, Perú. ¿Prefieres que te contactemos nosotros? Déjanos tus datos y un asesor te escribirá."
+        
+        if any(word in msg_lower for word in ["proyecto", "servicio", "qué hacen", "actividades", "trabajos"]):
+            return "AQUANTICA ofrece 4 líneas de servicio: 1) Ingeniería Civil (estructuras, cálculo, sismo), 2) Arquitectura (diseño, renders, planos), 3) Construcción (obras, remodelaciones, gestión), 4) Saneamiento Legal (regularización, licencias, municipalidades). ¿Cuál te interesa?"
+        
+        if any(word in msg_lower for word in ["gracias", "thank", "ok", "perfecto", "bien", "excelente"]):
+            return "¡De nada! Estamos aquí para ayudarte. Si tienes más preguntas sobre nuestros servicios de ingeniería, arquitectura, construcción o saneamiento legal, no dudes en consultar. ¿Te gustaría agendar una evaluación gratuita con uno de nuestros especialistas?"
+        
+        if any(word in msg_lower for word in ["adiós", "chau", "hasta luego", "nos vemos", "bye"]):
+            return "¡Hasta luego! Gracias por contactar a AQUANTICA. Si necesitas ayuda con proyectos de ingeniería, arquitectura, construcción o saneamiento legal, estamos a tu disposición. ¡Que tengas un excelente día!"
+        
+        # Respuesta por defecto (cuando no detecta intención específica)
+        return f"Entiendo que estás interesado en nuestros servicios. En AQUANTICA ofrecemos soluciones integrales de ingeniería, arquitectura, construcción y saneamiento legal en Lima, Perú. Para darte información precisa sobre tu caso específico, te recomiendo agendar una evaluación gratuita con uno de nuestros especialistas. ¿Te gustaría que te contactemos por WhatsApp al 977 498 144 o prefieres dejarnos tus datos para que un asesor te escriba?"
+    
     async def chat(self, message: str, context_type: str = "public") -> str:
-        """Chat con contexto RAG"""
+        """Chat con contexto RAG o fallback basado en reglas"""
+        # Si no está inicializado con LLM, usar respuestas basadas en reglas
         if not self.initialized:
-            return "El asistente AI está inicializando. Por favor intenta en unos momentos."
+            return self._rule_based_response(message)
         
         try:
             # 1. Buscar contexto relevante
