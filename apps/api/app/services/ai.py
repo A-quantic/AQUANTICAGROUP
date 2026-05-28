@@ -2,36 +2,58 @@
 
 import os
 from typing import Dict, List, Optional
-import openai
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain_pinecone import PineconeVectorStore
-from pinecone import Pinecone
 
 from app.config import settings
 
-# Initialize clients
-openai.api_key = settings.OPENAI_API_KEY
-embeddings = OpenAIEmbeddings(api_key=settings.OPENAI_API_KEY)
-llm = ChatOpenAI(
-    model=settings.OPENAI_MODEL,
-    api_key=settings.OPENAI_API_KEY,
-    temperature=0.2,
-)
+# Lazy initialization - clients created on first use
+_embeddings = None
+_llm = None
+_pc = None
+_vector_store = None
 
-# Initialize Pinecone
-pc = Pinecone(api_key=settings.PINECONE_API_KEY)
-vector_store = None
+def _get_openai_embeddings():
+    global _embeddings
+    if _embeddings is None and settings.OPENAI_API_KEY:
+        from langchain_openai import OpenAIEmbeddings
+        _embeddings = OpenAIEmbeddings(api_key=settings.OPENAI_API_KEY)
+    return _embeddings
 
-if settings.PINECONE_INDEX:
-    try:
-        index = pc.Index(settings.PINECONE_INDEX)
-        vector_store = PineconeVectorStore(
-            index=index,
-            embedding=embeddings,
-            namespace="aquantica",
+def _get_llm():
+    global _llm
+    if _llm is None and settings.OPENAI_API_KEY:
+        from langchain_openai import ChatOpenAI
+        _llm = ChatOpenAI(
+            model=settings.OPENAI_MODEL,
+            api_key=settings.OPENAI_API_KEY,
+            temperature=0.2,
         )
-    except Exception as e:
-        print(f"Pinecone initialization failed: {e}")
+    return _llm
+
+def _get_pinecone():
+    global _pc
+    if _pc is None and settings.PINECONE_API_KEY:
+        from pinecone import Pinecone
+        _pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+    return _pc
+
+def _get_vector_store():
+    global _vector_store
+    if _vector_store is None and settings.PINECONE_API_KEY and settings.PINECONE_INDEX:
+        try:
+            from langchain_pinecone import PineconeVectorStore
+            pc = _get_pinecone()
+            if pc and settings.PINECONE_INDEX:
+                index = pc.Index(settings.PINECONE_INDEX)
+                embeddings = _get_openai_embeddings()
+                if embeddings:
+                    _vector_store = PineconeVectorStore(
+                        index=index,
+                        embedding=embeddings,
+                        namespace="aquantica",
+                    )
+        except Exception as e:
+            print(f"Pinecone initialization failed: {e}")
+    return _vector_store
 
 
 async def chat_with_context(
@@ -67,6 +89,11 @@ Responde de manera concisa y útil."""
     ]
     
     try:
+        if not settings.OPENAI_API_KEY:
+            return "Servicio de IA temporalmente no disponible. Por favor contactanos por WhatsApp o email."
+        
+        import openai
+        openai.api_key = settings.OPENAI_API_KEY
         response = await openai.chat.completions.create(
             model=settings.OPENAI_MODEL,
             messages=messages,
@@ -162,6 +189,16 @@ Clasifica:
 Responde en formato JSON."""
 
     try:
+        if not settings.OPENAI_API_KEY:
+            return {
+                "leadId": lead_id,
+                "classification": '{"calidad": 50, "servicio": "General", "urgencia": "media", "sugerencias": "Contactar para evaluación"}',
+                "processedAt": "2024-01-01T00:00:00Z",
+                "note": "IA no configurada - clasificación manual requerida"
+            }
+        
+        import openai
+        openai.api_key = settings.OPENAI_API_KEY
         response = await openai.chat.completions.create(
             model=settings.OPENAI_MODEL,
             messages=[
