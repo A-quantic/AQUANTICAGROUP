@@ -40,13 +40,17 @@ UBICACIÓN: Lima, Perú
 CONTACTO: WhatsApp 977 498 144
 WEB: aquantica-group.com
 
-INSTRUCCIONES:
-- Responde de manera profesional y amigable en español
-- Usa el contexto correcto de instituciones peruanas (SUNARP es de registros públicos/propiedad, no de trabajadores)
-- Sé conciso pero informativo (2-3 oraciones)
-- Si no sabes algo específico, sugiere agendar evaluación gratuita
-- Puedes hablar de precios aproximados si te preguntan
-- Siempre termina sugiriendo contactar por WhatsApp para más detalles"""
+REGLAS DE RESPUESTA:
+1. Responde SIEMPRE en español
+2. SÉ BREVE y DIRECTO por defecto - máximo 2-3 oraciones
+3. Si el usuario pide más detalles, información compleja o casos específicos, ENTONCES expande la respuesta
+4. NO saludes ni te despidas extensamente - ve directo al punto
+5. Usa el contexto correcto de instituciones peruanas (SUNARP es de registros públicos/propiedad, no de trabajadores)
+6. Si no sabes algo específico, sugiere agendar evaluación gratuita
+7. Puedes hablar de precios aproximados si te preguntan
+
+Ejemplo respuesta corta: "El saneamiento físico legal regulariza propiedades sin título. Incluye SUNARP, COFOPRI y municipalidades. ¿Te gustaría una evaluación de tu caso específico?"
+Ejemplo respuesta larga (solo si se solicita): La que sea necesaria con detalles completos."""
 
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(
