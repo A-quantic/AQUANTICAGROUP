@@ -2,11 +2,11 @@
 
 import axios, { AxiosError, AxiosInstance } from "axios";
 
-// CACHE_BUST: 2024-01 - Forzar HTTPS siempre, nunca HTTP
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://amused-peace-production-424b.up.railway.app";
-const API_URL = API_BASE.startsWith("http://") 
-  ? API_BASE.replace("http://", "https://") 
-  : API_BASE;
+// CACHE_BUST: 2024-01-v2 - Forzar HTTPS siempre, nunca HTTP
+const RAW_URL = process.env.NEXT_PUBLIC_API_URL || "https://amused-peace-production-424b.up.railway.app";
+console.log("[API-CLIENT] Raw URL:", RAW_URL);
+const API_URL = RAW_URL.replace(/^http:\/\//i, "https://");
+console.log("[API-CLIENT] Final URL:", API_URL);
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_URL,
