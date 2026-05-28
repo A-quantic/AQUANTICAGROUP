@@ -44,13 +44,15 @@ class Settings(BaseSettings):
     AWS_BUCKET_NAME: str = "aquantica-documents"
     AWS_REGION: str = "us-east-1"
     
-    # CORS
+    # CORS - Permitir todos los orígenes de Vercel y dominios de Aquantica
     CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
         "https://aquantica-group.com",
         "https://www.aquantica-group.com",
         "https://a-quantic-aquanticagroup.vercel.app",
+        "https://aquanticagroup-1wooh66ot-aquantica-s-projects.vercel.app",
         "https://*.vercel.app",
+        "*",  # Permitir cualquier origen para desarrollo (temporal)
     ]
     
     # Webhooks
