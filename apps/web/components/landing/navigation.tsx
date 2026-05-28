@@ -92,7 +92,15 @@ export function Navigation() {
             </div>
 
             {/* CTA */}
-            <div className="hidden md:block">
+            <div className="hidden md:flex items-center gap-4">
+              <Link href="/portal">
+                <Button
+                  variant="ghost"
+                  className="text-white/60 hover:text-gold text-xs uppercase tracking-wider"
+                >
+                  Portal Clientes
+                </Button>
+              </Link>
               <Link href="#contacto">
                 <Button
                   variant="outline"
