@@ -5,32 +5,80 @@ import { RecentProjects } from "@/components/portal/recent-projects";
 import { ExpedienteTimeline } from "@/components/portal/expediente-timeline";
 
 async function getDashboardData(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: { clerkId: userId },
-    include: {
-      clientProfile: {
-        include: {
-          projects: {
-            take: 5,
-            orderBy: { createdAt: "desc" },
-            include: {
-              expediente: true,
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+      include: {
+        clientProfile: {
+          include: {
+            projects: {
+              take: 5,
+              orderBy: { createdAt: "desc" },
+              include: {
+                expediente: true,
+              },
             },
           },
         },
       },
-    },
-  });
-
-  return user;
+    });
+    return user;
+  } catch (error) {
+    console.error("Database error:", error);
+    return null;
+  }
 }
 
 export default async function PortalPage() {
   const { userId } = auth();
   
-  if (!userId) return null;
+  if (!userId) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <h1 className="text-2xl font-serif font-bold text-white mb-4">
+          Portal de Clientes
+        </h1>
+        <p className="text-muted-foreground mb-6">
+          Por favor inicia sesión para acceder a tu portal
+        </p>
+        <a 
+          href="/sign-in" 
+          className="px-6 py-3 bg-gold text-navy font-medium rounded-lg hover:bg-gold/90 transition-colors"
+        >
+          Iniciar Sesión
+        </a>
+      </div>
+    );
+  }
 
   const user = await getDashboardData(userId);
+  
+  // Si no hay usuario en la base de datos, mostrar estado vacío
+  if (!user) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-serif font-bold text-white">
+            Bienvenido a tu Portal
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Tu cuenta está activada. Pronto podrás ver tus proyectos aquí.
+          </p>
+        </div>
+        <div className="p-8 bg-navy/50 rounded-xl border border-gold/20 text-center">
+          <p className="text-white/60 mb-4">
+            No tienes proyectos registrados aún.
+          </p>
+          <a 
+            href="#contacto" 
+            className="px-6 py-3 bg-gold text-navy font-medium rounded-lg hover:bg-gold/90 transition-colors inline-block"
+          >
+            Iniciar un Proyecto
+          </a>
+        </div>
+      </div>
+    );
+  }
   
   const projects = user?.clientProfile?.projects || [];
   const activeProjects = projects.filter((p: any) => 
