@@ -1,0 +1,10 @@
+providers = ["python"]
+
+[phases.build]
+cmds = ["pip install -r requirements.txt"]
+
+[phases.setup]
+nixPkgs = ["python311", "gcc", "libpq"]
+
+[start]
+cmd = "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"

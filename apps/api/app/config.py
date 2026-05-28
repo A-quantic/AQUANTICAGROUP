@@ -44,6 +44,8 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "https://aquantica-group.com",
         "https://www.aquantica-group.com",
+        "https://a-quantic-aquanticagroup.vercel.app",
+        "https://*.vercel.app",
     ]
     
     # Webhooks
