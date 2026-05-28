@@ -64,6 +64,12 @@ async def health_check():
     return {"status": "healthy"}
 
 
+@app.get("/api/health")
+async def api_health_check():
+    """Health check endpoint for Railway"""
+    return {"status": "healthy", "service": "aquantica-api"}
+
+
 @app.get("/api/status")
 async def api_status():
     """Detailed API status with services"""
