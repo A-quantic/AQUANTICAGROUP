@@ -5,7 +5,6 @@
   "installCommand": "npm install --legacy-peer-deps",
   "env": {
     "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_bGVuaWVudC1saXphcmQtNjIuY2xlcmsuYWNjb3VudHMuZGV2JA",
-    "CLERK_SECRET_KEY": "sk_test_zXOop5ody9CCPDogO2v4QXawce25q8fGIHEnkj3U7T",
-    "NEXT_PUBLIC_API_URL": "https://aquantica-api.up.railway.app"
+    "CLERK_SECRET_KEY": "sk_test_zXOop5ody9CCPDogO2v4QXawce25q8fGIHEnkj3U7T"
   }
 }
