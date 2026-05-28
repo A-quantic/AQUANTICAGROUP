@@ -21,8 +21,15 @@ export function useProjects() {
   return useQuery({
     queryKey: projectsKeys.lists(),
     queryFn: async () => {
-      const response = await projectsApi.list();
-      return response.projects || [];
+      console.log("[useProjects] Fetching projects...");
+      try {
+        const response = await projectsApi.list();
+        console.log("[useProjects] Response:", response);
+        return response.projects || [];
+      } catch (error) {
+        console.error("[useProjects] Error:", error);
+        throw error;
+      }
     },
   });
 }

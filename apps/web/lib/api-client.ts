@@ -92,7 +92,9 @@ export const leadsApi = {
 
 export const projectsApi = {
   list: async () => {
+    console.log("[projectsApi.list] Starting request...");
     const response = await apiClient.get("/api/projects/");
+    console.log("[projectsApi.list] Response received:", response.status);
     return response.data;
   },
   get: async (id: string) => {
