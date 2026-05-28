@@ -14,6 +14,16 @@ from app.models.project import Project
 router = APIRouter()
 
 
+@router.options("/")
+async def projects_options():
+    """Handle CORS preflight for projects"""
+    response = JSONResponse(content={})
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
+
+
 @router.get("/")
 async def list_projects(
     skip: int = 0,
