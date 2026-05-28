@@ -43,7 +43,8 @@ async def upload_document(
     # Analyze with AI (background)
     analysis = await analyze_document(file, category)
     
-    return {
+    # Create response with CORS headers
+    response = JSONResponse({
         "id": document_id,
         "name": file.filename,
         "type": file.content_type,
@@ -54,7 +55,9 @@ async def upload_document(
         "expedienteId": expediente_id,
         "aiAnalysis": analysis,
         "uploadedById": "placeholder",
-    }
+    })
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 @router.get("/")
@@ -65,14 +68,16 @@ async def list_documents(
     db: AsyncSession = Depends(get_db),
 ):
     """List documents with filtering"""
-    return {
+    response = JSONResponse({
         "documents": [],
         "filters": {
             "projectId": project_id,
             "expedienteId": expediente_id,
             "category": category,
         },
-    }
+    })
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 @router.get("/{document_id}/")
