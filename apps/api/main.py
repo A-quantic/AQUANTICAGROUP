@@ -42,14 +42,30 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS - Configuración dinámica para permitir cualquier origen de Vercel
+# Si hay wildcard en CORS_ORIGINS, permitir cualquier origen dinámicamente
+if "*" in settings.CORS_ORIGINS:
+    # Modo desarrollo: permitir cualquier origen
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,  # False requerido cuando allow_origins=["*"]
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["*"],
+        max_age=3600,
+    )
+else:
+    # Modo producción: orígenes específicos
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["*"],
+        max_age=3600,
+    )
 
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
