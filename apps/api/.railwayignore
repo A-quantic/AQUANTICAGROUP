@@ -1,0 +1,9 @@
+# Ignore frontend files
+../web/
+../docs/
+../cms/
+../../package.json
+../../pnpm-lock.yaml
+../../pnpm-workspace.yaml
+../../node_modules/
+../../.next/
