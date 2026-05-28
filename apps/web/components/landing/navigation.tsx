@@ -40,38 +40,11 @@ export function Navigation() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
-              <svg
-                className="w-9 h-9"
-                viewBox="0 0 44 44"
-                fill="none"
-              >
-                <polygon
-                  points="22,4 38,36 6,36"
-                  fill="none"
-                  stroke="#c9a84c"
-                  strokeWidth="2"
-                />
-                <polygon
-                  points="22,10 34,32 10,32"
-                  fill="rgba(201,168,76,.1)"
-                  stroke="#c9a84c"
-                  strokeWidth="1"
-                />
-                <line
-                  x1="8"
-                  y1="40"
-                  x2="36"
-                  y2="40"
-                  stroke="#c9a84c"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M6 40 Q22 34 38 40"
-                  stroke="#c9a84c"
-                  strokeWidth="1.5"
-                  fill="none"
-                />
-              </svg>
+              <img 
+                src="/logo.png" 
+                alt="AQUANTICA" 
+                className="w-10 h-10 object-contain"
+              />
               <span className="font-serif text-xl font-bold text-gold tracking-wider">
                 AQUANTICA
               </span>
