@@ -21,7 +21,8 @@ const nextConfig = {
   },
   env: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "https://amused-peace-production-424b.up.railway.app",
+    // Forzar HTTPS - reemplazar http:// por https:// si existe
+    NEXT_PUBLIC_API_URL: (process.env.NEXT_PUBLIC_API_URL || "https://amused-peace-production-424b.up.railway.app").replace(/^http:\/\//, "https://"),
   },
 };
 
