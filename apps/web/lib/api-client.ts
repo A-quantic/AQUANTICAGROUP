@@ -30,11 +30,22 @@ export const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
   async (config) => {
     // Debug: log actual URL being used
-    console.log("[API] Request to:", config.baseURL, config.url);
+    const base = config.baseURL || "";
+    const path = config.url || "";
+    const fullUrl = base + path;
+    console.log("[API] Request URL:", fullUrl);
+    console.log("[API] baseURL:", base);
+    console.log("[API] path:", path);
     
     // Ensure HTTPS in baseURL
     if (config.baseURL && config.baseURL.startsWith("http://")) {
+      console.warn("[API] Fixing HTTP to HTTPS in baseURL");
       config.baseURL = config.baseURL.replace("http://", "https://");
+    }
+    
+    // Ensure HTTPS in full URL if somehow it's still HTTP
+    if (fullUrl && fullUrl.startsWith("http://")) {
+      console.error("[API] CRITICAL: Full URL is HTTP!", fullUrl);
     }
     
     // Get Clerk token if available
