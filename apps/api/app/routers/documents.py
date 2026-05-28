@@ -1,6 +1,7 @@
 """Documents API endpoints"""
 
-from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 import uuid
@@ -10,6 +11,16 @@ from app.services.storage import upload_to_s3
 from app.services.ai import analyze_document
 
 router = APIRouter()
+
+
+@router.options("/upload")
+async def upload_options():
+    """Handle CORS preflight for upload"""
+    response = JSONResponse(content={})
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
 
 
 @router.post("/upload")

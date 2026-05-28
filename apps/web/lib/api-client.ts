@@ -133,7 +133,7 @@ export const documentsApi = {
     if (metadata?.expedienteId) formData.append("expediente_id", metadata.expedienteId);
     if (metadata?.category) formData.append("category", metadata.category);
 
-    const response = await apiClient.post("/api/documents/upload", formData, {
+    const response = await apiClient.post("/api/documents/upload/", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -150,11 +150,11 @@ export const documentsApi = {
     if (filters?.expedienteId) params.append("expediente_id", filters.expedienteId);
     if (filters?.category) params.append("category", filters.category);
 
-    const response = await apiClient.get(`/api/documents?${params}`);
+    const response = await apiClient.get(`/api/documents/?${params}`);
     return response.data;
   },
   delete: async (id: string) => {
-    const response = await apiClient.delete(`/api/documents/${id}`);
+    const response = await apiClient.delete(`/api/documents/${id}/`);
     return response.data;
   },
 };
