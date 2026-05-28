@@ -7,24 +7,30 @@ import uuid
 from app.config import settings
 from app.services.ai_ollama import chat_with_ollama, OllamaAI
 from app.services.ai_local import chat_with_ai as chat_local
+from app.services.ai_groq import chat_with_groq, groq_ai
 from app.services.ai_hybrid import (
     analyze_document,
     generate_checklist,
     detect_missing_documents,
 )
 
-# Instancia de Ollama para verificar disponibilidad
+# Instancias para verificar disponibilidad
 ollama_ai = OllamaAI()
 
 def get_ai_type():
-    """Determinar qué AI usar basado en configuración actual"""
+    """Determinar qué AI usar basado en configuración actual (prioridad: Groq > Ollama > Local)"""
+    if settings.GROQ_API_KEY:
+        return "groq"
     if settings.AI_BASE_URL and settings.AI_MODEL_NAME:
         return "ollama"
     return "local"
 
 def get_chat_function():
     """Obtener función de chat según configuración"""
-    if get_ai_type() == "ollama":
+    ai_type = get_ai_type()
+    if ai_type == "groq":
+        return chat_with_groq
+    if ai_type == "ollama":
         return chat_with_ollama
     return chat_local
 
@@ -58,6 +64,13 @@ async def chat_endpoint(request: dict):
 async def ai_status():
     """Estado del AI"""
     ai_type = get_ai_type()
+    if ai_type == "groq":
+        return {
+            "type": "groq",
+            "available": groq_ai.available,
+            "model": groq_ai.model,
+            "provider": "Groq (Llama 3.1 8B)"
+        }
     if ai_type == "ollama":
         return {
             "type": "ollama",
